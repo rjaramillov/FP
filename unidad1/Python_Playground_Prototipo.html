@@ -72,42 +72,97 @@ body{
 
 /* EDITOR */
 #editor-wrap{background:#0F172A;}
+#editor-body{display:flex;align-items:stretch;}
+#line-numbers{
+  flex-shrink:0;width:50px;overflow:hidden;background:#0B1220;
+  padding-top:20px;user-select:none;
+}
+#line-numbers-inner{will-change:transform;}
+.ln-row{
+  height:30px;line-height:30px;font-family:'JetBrains Mono',monospace;
+  font-size:14px;color:#6E7BA0;text-align:right;padding-right:12px;
+  transition:color .15s;
+}
+.ln-row.ln-error{color:#FCA5A5;font-weight:700;}
+#editor-textarea-wrap{position:relative;flex:1;min-width:0;}
+#highlight-layer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.hl-row{
+  position:absolute;left:0;right:0;background:rgba(229,62,62,.14);
+  border-top:1px solid rgba(229,62,62,.4);border-bottom:1px solid rgba(229,62,62,.4);
+}
+.hl-row.flash{animation:hlFlash .9s ease;}
+@keyframes hlFlash{
+  0%{background:rgba(229,62,62,.45);}
+  100%{background:rgba(229,62,62,.14);}
+}
+/* Colored backdrop: sits behind the (text-transparent) textarea so the code
+   appears syntax-highlighted while staying fully editable — see resaltarPython() */
+#code-highlight{
+  position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;
+  margin:0;padding:20px 22px;color:#E2E8F0;
+  font-family:'JetBrains Mono',monospace;font-size:18px;line-height:30px;
+  white-space:pre-wrap;word-break:break-word;tab-size:4;
+}
+.tok-comment{color:#64748B;font-style:italic;}
+.tok-string{color:#F0B961;}
+.tok-number{color:#5EEAD4;}
+.tok-keyword{color:#93A5FF;font-weight:600;}
+.tok-builtin{color:#7DD3C0;}
 #code-editor{
-  width:100%;min-height:340px;background:#0F172A;color:#E2E8F0;
-  border:none;outline:none;resize:vertical;
-  font-family:'JetBrains Mono',monospace;font-size:16px;line-height:1.7;
+  position:relative;z-index:2;
+  width:100%;min-height:340px;background:transparent;color:transparent;caret-color:#E2E8F0;
+  border:none;outline:2px solid transparent;outline-offset:-2px;resize:vertical;
+  font-family:'JetBrains Mono',monospace;font-size:18px;line-height:30px;
   padding:20px 22px;tab-size:4;
 }
-#code-editor::placeholder{color:#4B5563;}
+#code-editor:focus{outline-color:#7C93FF;}
+#code-editor::selection{background:rgba(124,147,255,.35);}
+#code-editor::placeholder{color:#7A8AA3;}
+
 
 .editor-toolbar{
   background:#1A2336;padding:12px 22px;display:flex;gap:12px;align-items:center;
   border-top:1px solid rgba(255,255,255,.06);
 }
 #btn-run{
-  background:#38A169;color:white;border:none;border-radius:10px;
+  background:#0E9E8F;color:#12141C;border:none;border-radius:10px;
   padding:12px 26px;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;
   cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .15s;
 }
-#btn-run:hover:not(:disabled){background:#2F855A;transform:translateY(-1px);}
-#btn-run:disabled{background:#4B5563;cursor:not-allowed;}
+#btn-run:hover:not(:disabled){background:#14B39D;transform:translateY(-1px);}
+#btn-run:disabled{background:#4B5563;color:white;cursor:not-allowed;}
 #btn-clear-code{
   background:none;color:#A9B2C3;border:1px solid rgba(255,255,255,.15);border-radius:10px;
   padding:11px 20px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;
   cursor:pointer;transition:all .15s;
 }
 #btn-clear-code:hover{background:rgba(255,255,255,.06);color:white;}
+#btn-stop{
+  background:rgba(229,62,62,.15);color:#FCA5A5;border:1px solid rgba(229,62,62,.4);
+  border-radius:10px;padding:11px 18px;font-family:'JetBrains Mono',monospace;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;
+}
+#btn-stop:hover:not(:disabled){background:rgba(229,62,62,.28);color:white;}
+#btn-stop:disabled{opacity:.5;cursor:not-allowed;}
+#btn-stop.hidden{display:none;}
+#btn-reset-python{
+  background:none;color:#B4C0FF;border:1px solid rgba(124,147,255,.35);border-radius:10px;
+  padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+#btn-reset-python:hover:not(:disabled){background:rgba(124,147,255,.12);color:white;}
+#btn-reset-python:disabled{opacity:.5;cursor:not-allowed;}
 .run-hint{
-  margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#4B5563;
+  margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#7A8AA3;
 }
 
 /* CONSOLE */
 #console-wrap{background:#12141C;flex:1;min-height:340px;display:flex;flex-direction:column;}
 #console-output{
-  flex:1;padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:16px;
+  flex:1;padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:18px;
   line-height:1.7;color:#5EEAD4;overflow-y:auto;white-space:pre-wrap;word-break:break-word;
 }
-#console-output .placeholder-text{color:#4B5563;font-style:italic;}
+#console-output .placeholder-text{color:#7A8AA3;font-style:italic;}
 #console-output .error-line{color:#FCA5A5;}
 #console-output .error-block{
   background:rgba(229,62,62,.1);border-left:3px solid #E53E3E;
@@ -117,6 +172,54 @@ body{
   display:inline-block;background:rgba(56,161,105,.15);color:#68D391;
   padding:2px 10px;border-radius:6px;font-size:13px;margin-bottom:8px;
 }
+#console-output .system-note{
+  display:block;color:#8892A0;font-style:italic;font-size:13.5px;margin:4px 0;
+}
+
+/* FRIENDLY ERROR CARD */
+.error-card{
+  background:rgba(229,62,62,.08);border-left:3px solid #E53E3E;
+  padding:14px 16px 16px;margin:8px 0;border-radius:6px;
+}
+.error-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.error-badge{
+  display:inline-flex;align-items:center;gap:6px;background:rgba(229,62,62,.18);color:#FCA5A5;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:700;
+  padding:3px 10px;border-radius:999px;letter-spacing:.3px;
+}
+.error-line-chip{
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;
+  background:rgba(124,147,255,.14);color:#B4C0FF;border:1px solid rgba(124,147,255,.35);
+  padding:3px 12px;border-radius:999px;cursor:pointer;transition:all .15s;
+}
+.error-line-chip:hover{background:rgba(124,147,255,.28);color:white;}
+.error-card-title{
+  font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:17px;color:#FECACA;
+  margin-bottom:6px;line-height:1.4;
+}
+.error-card-body{
+  font-family:'IBM Plex Sans',sans-serif;font-size:17px;color:#E4B8B8;
+  line-height:1.6;margin-bottom:8px;
+}
+.error-card-body code{
+  font-family:'JetBrains Mono',monospace;background:rgba(0,0,0,.25);
+  padding:1px 6px;border-radius:4px;color:#FCA5A5;font-size:16px;
+}
+.error-card-tip{
+  font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#F3D9A4;
+  background:rgba(232,153,42,.1);border-radius:6px;padding:8px 12px;margin-bottom:10px;line-height:1.5;
+}
+.error-toggle-raw{
+  background:none;border:none;color:#8892A0;font-family:'JetBrains Mono',monospace;
+  font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;
+}
+.error-toggle-raw:hover{color:#B4C0FF;}
+.error-raw{
+  margin-top:8px;background:rgba(0,0,0,.3);border-radius:6px;padding:10px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:#FCA5A5;
+  white-space:pre-wrap;word-break:break-word;
+}
+.error-raw.hidden{display:none;}
 .console-toolbar{
   background:#1A1D26;padding:10px 22px;display:flex;justify-content:flex-end;
   border-top:1px solid rgba(255,255,255,.06);
@@ -146,7 +249,60 @@ body{
   margin-top:22px;background:#EEF2FF;border:1px solid #C7D0FF;border-radius:14px;
   padding:16px 22px;display:flex;gap:14px;align-items:flex-start;
 }
-#footer-note p{font-size:14.5px;color:#374996;line-height:1.55;}
+#footer-note p{font-size:17px;color:#374996;line-height:1.6;}
+
+/* TRANSPARENCIA IAG — desarrollo del artefacto (distinto del footer-note de arriba,
+   que habla del código del alumno; esto habla de cómo se construyó la herramienta) */
+#ai-dev-note{
+  margin-top:14px;padding:12px 22px;text-align:center;
+  font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:#67707F;line-height:1.6;
+}
+#ai-dev-note strong{color:#4B5563;}
+
+/* LICENCIA CREATIVE COMMONS — declaración explícita requerida por la
+   Etapa 1 de la Guía REDI (su ausencia causa rechazo automático) */
+#license-note{
+  margin-top:22px;background:#EEF2FF;border:1px solid #C7D0FF;border-radius:14px;
+  padding:16px 22px;display:flex;gap:14px;align-items:flex-start;
+}
+#license-note p{font-size:16px;color:#374996;line-height:1.6;}
+#license-note a{color:#3B5BFB;font-weight:600;text-decoration:underline;}
+
+/* PROPÓSITO Y FUNDAMENTACIÓN PEDAGÓGICA — panel plegable con justificación
+   referenciada (APA 7) para estudiantes y evaluadores del REDI */
+#about-section{margin-top:22px;}
+.about-toggle-btn{
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  background:white;border:1px solid #E4E4E7;border-radius:16px;
+  padding:18px 26px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;
+  color:#12141C;cursor:pointer;transition:all .15s;text-align:left;
+}
+.about-toggle-btn:hover{border-color:#C7D0FF;background:#FAFAFF;}
+.about-toggle-btn .chevron{transition:transform .2s;color:#67707F;flex-shrink:0;margin-left:12px;}
+.about-toggle-btn[aria-expanded="true"] .chevron{transform:rotate(180deg);}
+#about-panel{
+  margin-top:12px;background:white;border:1px solid #E4E4E7;border-radius:16px;
+  padding:26px 28px;
+}
+#about-panel.hidden{display:none;}
+#about-panel h3{font-family:'Space Grotesk',sans-serif;font-size:20px;color:#12141C;margin-bottom:14px;}
+#about-panel p{font-family:'IBM Plex Sans',sans-serif;font-size:17px;color:#374151;line-height:1.7;margin-bottom:14px;}
+#about-panel h4{
+  font-family:'JetBrains Mono',monospace;font-size:13px;color:#67707F;text-transform:uppercase;
+  letter-spacing:.5px;margin:22px 0 14px;border-top:1px solid #E4E4E7;padding-top:20px;
+}
+.ref-entry{
+  font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:#4B5563;line-height:1.6;
+  margin-bottom:12px;padding-left:26px;text-indent:-26px;
+}
+.ref-entry a{color:#3B5BFB;word-break:break-all;}
+
+/* ACCESIBILIDAD: respeta la preferencia del sistema/navegador de reducir animaciones */
+@media (prefers-reduced-motion: reduce){
+  .status-dot.loading{animation:none;opacity:.85;}
+  .spinner{animation:none;border-top-color:rgba(124,147,255,.5);}
+  .hl-row.flash{animation:none;background:rgba(229,62,62,.32);}
+}
 </style>
 </head>
 <body>
@@ -178,12 +334,21 @@ body{
       <div class="panel-header" style="background:#1A2336;border-bottom-color:rgba(255,255,255,.06);">
         <div class="panel-title" style="color:#7C93FF;">💻 EDITOR</div>
       </div>
-      <textarea id="code-editor" spellcheck="false" placeholder="Escribe tu código Python aquí...">print("¡Hola! Bienvenido a Python")
+      <div id="editor-body">
+        <div id="line-numbers"><div id="line-numbers-inner"></div></div>
+        <div id="editor-textarea-wrap">
+          <div id="highlight-layer"></div>
+          <pre id="code-highlight" aria-hidden="true"></pre>
+          <textarea id="code-editor" spellcheck="false" placeholder="Escribe tu código Python aquí...">print("¡Hola! Bienvenido a Python")
 nombre = input("¿Cómo te llamas? ")
 print(f"Hola, {nombre}. Bienvenido a Fundamentos de Programación")</textarea>
+        </div>
+      </div>
       <div class="editor-toolbar">
         <button id="btn-run" onclick="runCode()" disabled>▶ Run</button>
+        <button id="btn-stop" class="hidden" onclick="detenerEjecucion()">⏹ Detener</button>
         <button id="btn-clear-code" onclick="clearEditor()">Limpiar código</button>
+        <button id="btn-reset-python" onclick="reiniciarPython()" disabled title="Borra todas las variables y reinicia Python desde cero">🔄 Reiniciar Python</button>
         <span class="run-hint">Ctrl+Enter también ejecuta</span>
       </div>
     </div>
@@ -205,8 +370,34 @@ print(f"Hola, {nombre}. Bienvenido a Fundamentos de Programación")</textarea>
       <button class="example-chip" onclick="loadExample('hola')">Hola, mundo</button>
       <button class="example-chip" onclick="loadExample('fstring')">f-strings</button>
       <button class="example-chip" onclick="loadExample('condicional')">Condicional (if/else)</button>
+      <button class="example-chip" onclick="loadExample('bucle')">Bucles (for/while)</button>
+      <button class="example-chip" onclick="loadExample('funcion')">Funciones</button>
+      <button class="example-chip" onclick="loadExample('lista')">Listas</button>
       <button class="example-chip" onclick="loadExample('error_sintaxis')">Ver un SyntaxError</button>
       <button class="example-chip" onclick="loadExample('error_tipo')">Ver un TypeError</button>
+      <button class="example-chip" onclick="loadExample('error_nombre')">Ver un NameError</button>
+      <button class="example-chip" onclick="loadExample('error_indice')">Ver un IndexError</button>
+      <button class="example-chip" onclick="loadExample('error_cero')">Ver un ZeroDivisionError</button>
+    </div>
+  </div>
+
+  <div id="about-section">
+    <button id="btn-about-toggle" class="about-toggle-btn" type="button" aria-expanded="false" aria-controls="about-panel" onclick="toggleAboutPanel()">
+      <span>ℹ️ ¿Para qué sirve este Playground?</span>
+      <span class="chevron">▾</span>
+    </button>
+    <div id="about-panel" class="hidden">
+      <h3>¿Para qué sirve este Playground?</h3>
+      <p>Este espacio existe para que practiques Python libremente, sin calificación y sin miedo a "romper" nada — tu código nunca sale de tu computadora y no se guarda en ningún lado.</p>
+      <p>Aprender a programar por primera vez es distinto a aprender otras materias: además del contenido nuevo, tienes que dominar la sintaxis de un lenguaje, un entorno desconocido y una forma de pensar distinta, todo al mismo tiempo (Kelleher &amp; Pausch, 2005). Es normal sentir ansiedad al empezar — la investigación ha encontrado que muchos estudiantes de primer semestre sienten miedo real de "descomponer la computadora" al programar, y que esa ansiedad baja conforme ganan experiencia y confianza (Connolly et al., 2009). Este Playground busca acortar ese proceso: aquí, equivocarte no tiene consecuencias — es simplemente parte de aprender.</p>
+      <p>Por eso el botón "Run" te da una respuesta inmediata: la retroalimentación rápida es uno de los factores más estudiados para que la práctica de programación realmente se traduzca en aprendizaje (Keuning et al., 2018). Y cuando tu código falla, en vez de mostrarte solo el mensaje técnico de Python, este Playground te da una explicación en español sencillo — porque los mensajes de error de compiladores e intérpretes son, desde hace décadas, una de las barreras más documentadas para quienes están aprendiendo a programar (Becker et al., 2019), y factores concretos como el uso de jerga técnica, la longitud del mensaje y el vocabulario influyen directamente en qué tan bien lo entiende un principiante (Denny et al., 2021).</p>
+      <p>Por eso este Playground se ofrece como una herramienta aparte, no como una actividad dentro de una sesión guiada: cuando el objetivo es que practiques a fondo y por tu cuenta, conviene un espacio independiente que puedas reabrir cuantas veces necesites, en vez de un ejercicio atado a una clase puntual. Es una herramienta de práctica libre, no de evaluación — complementa, pero no sustituye, las actividades del curso que sí generan evidencia para tu portafolio.</p>
+      <h4>Referencias (APA 7)</h4>
+      <p class="ref-entry">Becker, B. A., Denny, P., Pettit, R., Bouchard, D., Bouvier, D. J., Harrington, B., Kamil, A., Karkare, A., McDonald, C., Osera, P.-M., Pearce, J. L., &amp; Prather, J. (2019). Compiler error messages considered unhelpful: The landscape of text-based programming error message research. En <em>Proceedings of the 2019 ITiCSE Working Group Reports</em> (pp. 177–210). Association for Computing Machinery. <a href="https://doi.org/10.1145/3344429.3372508" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/3344429.3372508</a></p>
+      <p class="ref-entry">Connolly, C., Murphy, E., &amp; Moore, S. (2009). Programming anxiety amongst computing students—A key in the retention debate? <em>IEEE Transactions on Education, 52</em>(1), 52–56. <a href="https://doi.org/10.1109/TE.2008.917193" target="_blank" rel="noopener noreferrer">https://doi.org/10.1109/TE.2008.917193</a></p>
+      <p class="ref-entry">Denny, P., Prather, J., Becker, B. A., Mooney, C., Homer, J., Albrecht, Z. C., &amp; Powell, G. B. (2021). On designing programming error messages for novices: Readability and its constituent factors. En <em>Proceedings of the 2021 CHI Conference on Human Factors in Computing Systems</em> (Artículo 55, pp. 1–15). Association for Computing Machinery. <a href="https://doi.org/10.1145/3411764.3445696" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/3411764.3445696</a></p>
+      <p class="ref-entry">Kelleher, C., &amp; Pausch, R. (2005). Lowering the barriers to programming: A taxonomy of programming environments and languages for novice programmers. <em>ACM Computing Surveys, 37</em>(2), 83–137. <a href="https://doi.org/10.1145/1089733.1089734" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/1089733.1089734</a></p>
+      <p class="ref-entry">Keuning, H., Jeuring, J., &amp; Heeren, B. (2018). A systematic literature review of automated feedback generation for programming exercises. <em>ACM Transactions on Computing Education, 19</em>(1), Artículo 3, 1–43. <a href="https://doi.org/10.1145/3231711" target="_blank" rel="noopener noreferrer">https://doi.org/10.1145/3231711</a></p>
     </div>
   </div>
 
@@ -214,6 +405,13 @@ print(f"Hola, {nombre}. Bienvenido a Fundamentos de Programación")</textarea>
     <span style="font-size:20px;">🔒</span>
     <p><strong>Este es Python real, corriendo directamente en tu navegador</strong> — no hay ningún agente de IA que escriba código por ti. Todo lo que ejecutas aquí lo escribiste tú. Tu código nunca sale de tu computadora: no se envía a ningún servidor.</p>
   </div>
+
+  <div id="license-note">
+    <span style="font-size:20px;">📄</span>
+    <p><strong>Python Playground — Fundamentos de Programación</strong> © 2026 Ricardo Jaramillo Velasco, Universidad de Colima. Este recurso educativo está disponible bajo licencia <a rel="license noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank">Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional (CC BY-NC-SA 4.0)</a>.</p>
+  </div>
+
+  <p id="ai-dev-note">🤖 Este Playground fue desarrollado por el profesor con apoyo de Inteligencia Artificial Generativa (Claude), dentro del propósito de <strong>elaborar materiales educativos</strong> declarado en la Declaratoria de Uso de IAG del programa analítico de este curso (Acuerdo No. 23 de 2024, Universidad de Colima).</p>
 
 </div>
 
@@ -228,7 +426,133 @@ const consoleOutput = document.getElementById('console-output');
 const statusDot = document.getElementById('status-dot');
 const statusText = document.getElementById('status-text');
 const btnRun = document.getElementById('btn-run');
+const btnStop = document.getElementById('btn-stop');
+const btnResetPython = document.getElementById('btn-reset-python');
 const loadingOverlay = document.getElementById('loading-overlay');
+
+// ═══════════════════════════════════════════════════════════════════
+// EDITOR GUTTER (line numbers) + ERROR LINE HIGHLIGHT + COLOR DE SINTAXIS
+// ═══════════════════════════════════════════════════════════════════
+const LINE_HEIGHT = 30;   // must match #code-editor's line-height in CSS
+const PAD_TOP = 20;       // must match #code-editor's top padding in CSS
+const editorEl = document.getElementById('code-editor');
+const gutterEl = document.getElementById('line-numbers');
+const gutterInner = document.getElementById('line-numbers-inner');
+const hlLayer = document.getElementById('highlight-layer');
+const codeHighlightEl = document.getElementById('code-highlight');
+let currentErrorLine = null;
+
+function renderLineNumbers(){
+  const total = editorEl.value.split('\n').length;
+  let html = '';
+  for(let i = 1; i <= total; i++){
+    html += `<div class="ln-row${i === currentErrorLine ? ' ln-error' : ''}">${i}</div>`;
+  }
+  gutterInner.innerHTML = html;
+  syncScrollLayers();
+}
+
+function syncGutterScroll(){
+  gutterInner.style.transform = `translateY(${-editorEl.scrollTop}px)`;
+}
+
+function positionHighlight(){
+  if(currentErrorLine == null){
+    hlLayer.innerHTML = '';
+    return;
+  }
+  const top = PAD_TOP + (currentErrorLine - 1) * LINE_HEIGHT - editorEl.scrollTop;
+  hlLayer.innerHTML = `<div class="hl-row" style="top:${top}px;height:${LINE_HEIGHT}px;"></div>`;
+}
+
+// Mantiene la columna de números, la franja roja de error y el fondo con
+// color de sintaxis todos alineados con el scroll real del textarea.
+function syncScrollLayers(){
+  syncGutterScroll();
+  positionHighlight();
+  codeHighlightEl.scrollTop = editorEl.scrollTop;
+}
+
+function flashErrorLine(){
+  const row = hlLayer.querySelector('.hl-row');
+  if(!row) return;
+  row.classList.add('flash');
+  row.addEventListener('animationend', () => row.classList.remove('flash'), { once: true });
+}
+
+function setErrorLine(n){
+  currentErrorLine = n;
+  renderLineNumbers();
+  if(n != null) flashErrorLine();
+}
+
+function jumpToLine(n){
+  currentErrorLine = n;
+  const lines = editorEl.value.split('\n');
+  let start = 0;
+  for(let i = 0; i < n - 1 && i < lines.length; i++) start += lines[i].length + 1;
+  const end = start + (lines[n - 1] ? lines[n - 1].length : 0);
+  editorEl.focus();
+  editorEl.setSelectionRange(start, end);
+  editorEl.scrollTop = Math.max(0, PAD_TOP + (n - 1) * LINE_HEIGHT - editorEl.clientHeight / 2);
+  renderLineNumbers();
+  flashErrorLine();
+}
+
+// ── Color de sintaxis ──────────────────────────────────────────────
+// Resaltador propio (sin librerías externas, para que el archivo siga
+// siendo un solo HTML autocontenido). No es un parser real de Python:
+// usa expresiones regulares por categoría, suficiente para lo que se ve
+// en primer semestre (comentarios, cadenas, números, palabras clave y
+// funciones incorporadas más comunes).
+const PY_KEYWORDS = 'def|return|if|elif|else|for|while|in|not|and|or|is|import|from|as|class|try|except|finally|raise|with|pass|break|continue|lambda|yield|global|nonlocal|assert|del|True|False|None|self';
+const PY_BUILTINS = 'print|input|len|range|int|str|float|bool|list|dict|tuple|set|type|sum|min|max|sorted|enumerate|zip|open|format|abs|round|map|filter';
+const TOKEN_RE = new RegExp(
+  "(#[^\\n]*)" +                                          // 1: comentario
+  "|('''[\\s\\S]*?'''|\"\"\"[\\s\\S]*?\"\"\"|'(?:\\\\.|[^'\\\\\\n])*'|\"(?:\\\\.|[^\"\\\\\\n])*\")" + // 2: cadena
+  "|(\\b\\d+\\.?\\d*\\b)" +                                // 3: número
+  "|(\\b(?:" + PY_KEYWORDS + ")\\b)" +                     // 4: palabra clave
+  "|(\\b(?:" + PY_BUILTINS + ")\\b)",                      // 5: función incorporada
+  'g'
+);
+
+function escapeHtml(s){
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function resaltarPython(code){
+  let out = '';
+  let lastIndex = 0;
+  TOKEN_RE.lastIndex = 0;
+  let m;
+  while((m = TOKEN_RE.exec(code)) !== null){
+    out += escapeHtml(code.slice(lastIndex, m.index));
+    const text = escapeHtml(m[0]);
+    if(m[1] !== undefined) out += `<span class="tok-comment">${text}</span>`;
+    else if(m[2] !== undefined) out += `<span class="tok-string">${text}</span>`;
+    else if(m[3] !== undefined) out += `<span class="tok-number">${text}</span>`;
+    else if(m[4] !== undefined) out += `<span class="tok-keyword">${text}</span>`;
+    else out += `<span class="tok-builtin">${text}</span>`;
+    lastIndex = TOKEN_RE.lastIndex;
+  }
+  out += escapeHtml(code.slice(lastIndex));
+  return out + '\n'; // línea extra para que la última línea vacía también mida lo mismo que en el textarea
+}
+
+function renderSyntaxHighlight(){
+  codeHighlightEl.innerHTML = resaltarPython(editorEl.value);
+  codeHighlightEl.scrollTop = editorEl.scrollTop;
+}
+
+function onEditorInput(){
+  renderLineNumbers();
+  renderSyntaxHighlight();
+}
+
+editorEl.addEventListener('input', onEditorInput);
+editorEl.addEventListener('scroll', syncScrollLayers);
+window.addEventListener('resize', positionHighlight);
+
 
 // Bridge function for input() -> native browser prompt (blocking, synchronous)
 window.pyInputBridge = function(promptText){
@@ -238,32 +562,181 @@ window.pyInputBridge = function(promptText){
 
 async function initPyodide(){
   try{
-    pyodide = await loadPyodide();
-
-    // Redirect stdout/stderr to our console panel in real time
-    pyodide.setStdout({ batched: (msg) => appendConsole(msg, 'stdout') });
-    pyodide.setStderr({ batched: (msg) => appendConsole(msg, 'stderr') });
-
-    // Override input() to use the browser's native prompt (fully synchronous, reliable)
-    pyodide.runPython(`
-import builtins
-from js import pyInputBridge
-def _uadc_input(prompt=''):
-    return pyInputBridge(str(prompt))
-builtins.input = _uadc_input
-`);
+    await Promise.all([ initMainThreadPyodide(), createWorker() ]);
 
     pyodideReady = true;
     statusDot.classList.remove('loading');
     statusDot.classList.add('ready');
     statusText.textContent = 'Python listo';
     btnRun.disabled = false;
+    btnResetPython.disabled = false;
     loadingOverlay.classList.add('hidden');
   }catch(err){
     statusText.textContent = 'Error al cargar';
     document.getElementById('loading-text').textContent = 'No se pudo cargar Python. Revisa tu conexión a internet y recarga la página.';
     document.getElementById('loading-sub').textContent = '';
     console.error(err);
+  }
+}
+
+async function initMainThreadPyodide(){
+  pyodide = await loadPyodide();
+
+  // Redirect stdout/stderr to our console panel in real time
+  pyodide.setStdout({ batched: (msg) => appendConsole(msg, 'stdout') });
+  pyodide.setStderr({ batched: (msg) => appendConsole(msg, 'stderr') });
+
+  // Override input() to use the browser's native prompt (fully synchronous, reliable)
+  pyodide.runPython(`
+import builtins
+from js import pyInputBridge
+def _uadc_input(prompt=''):
+    return pyInputBridge(str(prompt))
+builtins.input = _uadc_input
+`);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SEGUNDO PYODIDE EN UN WEB WORKER
+// Se usa solo para código que NO usa input(): así, si el código se
+// queda en un bucle infinito, el botón "Detener" siempre puede matar
+// el Worker de un golpe (esto es imposible con Pyodide en el hilo
+// principal, porque JS es de un solo hilo y un bucle bloqueante ahí
+// congela literalmente toda la página, incluidos los botones).
+// input() no puede replicarse 100% síncrono dentro de un Worker sin
+// activar aislamiento de origen cruzado (SharedArrayBuffer), algo que
+// GitHub Pages no soporta de forma nativa — por eso ese código sigue
+// corriendo en el hilo principal, como antes.
+// ═══════════════════════════════════════════════════════════════════
+const WORKER_SRC = [
+  "importScripts('https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js');",
+  "let pyodide = null;",
+  "async function init(){",
+  "  try{",
+  "    pyodide = await loadPyodide();",
+  "    pyodide.setStdout({ batched: (msg) => postMessage({ type: 'stdout', text: msg }) });",
+  "    pyodide.setStderr({ batched: (msg) => postMessage({ type: 'stderr', text: msg }) });",
+  "    pyodide.runPython(\"import builtins\");",
+  "    pyodide.runPython(\"def _worker_input(prompt=''): raise RuntimeError('input() no esta disponible en este modo rapido de ejecucion.')\");",
+  "    pyodide.runPython(\"builtins.input = _worker_input\");",
+  "    postMessage({ type: 'ready' });",
+  "  }catch(err){",
+  "    postMessage({ type: 'init-error', message: (err && err.message) || String(err) });",
+  "  }",
+  "}",
+  "self.onmessage = async (e) => {",
+  "  const msg = e.data;",
+  "  if(msg.type === 'run'){",
+  "    try{",
+  "      await pyodide.runPythonAsync(msg.code);",
+  "      postMessage({ type: 'done' });",
+  "    }catch(err){",
+  "      postMessage({ type: 'error', message: (err && err.message) || String(err) });",
+  "    }",
+  "  }",
+  "};",
+  "init();"
+].join('\n');
+
+const WORKER_URL = URL.createObjectURL(new Blob([WORKER_SRC], { type: 'application/javascript' }));
+let pyWorker = null;
+
+function createWorker(){
+  return new Promise((resolve, reject) => {
+    const w = new Worker(WORKER_URL);
+    w.onmessage = (e) => {
+      const msg = e.data;
+      if(msg.type === 'ready'){
+        w.onmessage = mainWorkerHandler;
+        pyWorker = w;
+        resolve();
+      }else if(msg.type === 'init-error'){
+        reject(new Error(msg.message));
+      }
+    };
+    w.onerror = (e) => reject(new Error(e.message || 'Error desconocido del Worker'));
+  });
+}
+
+function mainWorkerHandler(e){
+  const msg = e.data;
+  if(msg.type === 'stdout') appendConsole(msg.text, 'stdout');
+  else if(msg.type === 'stderr') appendConsole(msg.text, 'stderr');
+  else if(msg.type === 'done') finishWorkerRun();
+  else if(msg.type === 'error'){
+    const analisis = analizarError(msg.message);
+    appendErrorCard(analisis);
+    setErrorLine(analisis.line);
+    finishWorkerRun();
+  }
+}
+
+function finishWorkerRun(){
+  btnRun.disabled = false;
+  btnRun.textContent = '▶ Run';
+  btnStop.classList.add('hidden');
+  btnResetPython.disabled = false;
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+function appendSystemNote(text){
+  const placeholder = consoleOutput.querySelector('.placeholder-text');
+  if(placeholder) placeholder.remove();
+  const span = document.createElement('span');
+  span.className = 'system-note';
+  span.textContent = text;
+  consoleOutput.appendChild(span);
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
+}
+
+async function detenerEjecucion(){
+  if(!pyWorker) return;
+  pyWorker.terminate();
+  pyWorker = null;
+  appendSystemNote('⏹ Ejecución detenida. Reiniciando el entorno de Python…');
+  btnStop.disabled = true;
+  btnRun.disabled = true;
+  btnResetPython.disabled = true;
+  btnRun.textContent = '⏳ Reiniciando Python...';
+  try{
+    await createWorker();
+    appendSystemNote('✓ Entorno de Python listo de nuevo.');
+  }catch(err){
+    appendSystemNote('⚠ No se pudo reiniciar el entorno de Python. Recarga la página.');
+    console.error(err);
+  }finally{
+    btnStop.disabled = false;
+    btnStop.classList.add('hidden');
+    btnRun.disabled = false;
+    btnResetPython.disabled = false;
+    btnRun.textContent = '▶ Run';
+  }
+}
+
+// Borra todas las variables/funciones que el alumno haya creado, en AMBOS
+// entornos de Python (hilo principal y Worker), sin tener que recargar la
+// página. Útil cuando el código "funciona" solo porque quedó una variable
+// viva de una corrida anterior.
+async function reiniciarPython(){
+  if(!pyodideReady || !pyWorker) return;
+  appendSystemNote('🔄 Reiniciando el entorno de Python (se borran todas las variables)…');
+  btnRun.disabled = true;
+  btnResetPython.disabled = true;
+  setErrorLine(null);
+  try{
+    pyodide.runPython("import builtins as _uadc_b");
+    pyodide.runPython("_uadc_keep = set(dir(_uadc_b)) | {'__name__','__doc__','__package__','__loader__','__spec__','__builtins__','__file__'}");
+    pyodide.runPython("for _uadc_n in [k for k in globals() if k not in _uadc_keep and not k.startswith('_uadc')]:\n    del globals()[_uadc_n]");
+    pyWorker.terminate();
+    pyWorker = null;
+    await createWorker();
+    appendSystemNote('✓ Entorno de Python reiniciado. Todas las variables se borraron.');
+  }catch(err){
+    appendSystemNote('⚠ No se pudo reiniciar por completo. Si algo se ve raro, recarga la página.');
+    console.error(err);
+  }finally{
+    btnRun.disabled = false;
+    btnResetPython.disabled = false;
   }
 }
 
@@ -290,26 +763,269 @@ function appendErrorBlock(message){
   consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
 
+function toggleAboutPanel(){
+  const panel = document.getElementById('about-panel');
+  const btn = document.getElementById('btn-about-toggle');
+  const hidden = panel.classList.toggle('hidden');
+  btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+}
+
 function clearConsole(){
   consoleOutput.innerHTML = '<span class="placeholder-text">Aquí verás el resultado de tu programa cuando presiones Run...</span>';
 }
 
 function clearEditor(){
-  document.getElementById('code-editor').value = '';
+  editorEl.value = '';
+  setErrorLine(null);
+  renderSyntaxHighlight();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TRADUCTOR DE ERRORES DE PYTHON A ESPAÑOL SENCILLO
+// ═══════════════════════════════════════════════════════════════════
+function tipoEsp(t){
+  const mapa = {
+    int: 'un número entero (int)', float: 'un número decimal (float)',
+    str: 'texto (str)', bool: 'un booleano (bool)', list: 'una lista (list)',
+    dict: 'un diccionario (dict)', tuple: 'una tupla (tuple)', set: 'un conjunto (set)',
+    NoneType: 'None (ningún valor)', function: 'una función'
+  };
+  return mapa[t] || `un valor de tipo "${t}"`;
+}
+
+// Cada patrón: { tipo: 'NombreDeExcepciónDePython', re: /.../, build(match) => {titulo, cuerpo, consejo} }
+const PATRONES = [
+  // ── SyntaxError / IndentationError ──
+  { tipo:'SyntaxError', re:/was never closed/, build(m,msg){
+    const simbolo = (msg.match(/'(.)'/)||[])[1] || '(';
+    const nombre = {'(':'paréntesis','[':'corchete','{':'llave'}[simbolo] || 'símbolo';
+    return { titulo:`Falta cerrar un ${nombre}`,
+      cuerpo:`Abriste un <code>${simbolo}</code> pero el programa nunca encontró su cierre. Revisa la línea marcada y cuenta que cada apertura tenga su cierre correspondiente.` };
+  }},
+  { tipo:'SyntaxError', re:/unterminated string literal/, build(){
+    return { titulo:'Faltan comillas de cierre',
+      cuerpo:'Abriste un texto con comillas pero no lo cerraste con el mismo tipo de comillas. Revisa que cada <code>"</code> o <code>\'</code> de apertura tenga su pareja de cierre en la misma línea.' };
+  }},
+  { tipo:'SyntaxError', re:/Missing parentheses in call to 'print'/, build(){
+    return { titulo:'A print le faltan paréntesis',
+      cuerpo:'En Python, <code>print</code> es una función y siempre necesita paréntesis: <code>print("tu mensaje")</code>, no <code>print "tu mensaje"</code>.' };
+  }},
+  { tipo:'SyntaxError', re:/Maybe you meant '==' instead of '='/, build(){
+    return { titulo:'¿Quisiste comparar en vez de asignar?',
+      cuerpo:'Usaste un solo <code>=</code> donde probablemente necesitabas <code>==</code>. Un <code>=</code> asigna un valor a una variable; <code>==</code> compara si dos valores son iguales (por ejemplo, dentro de un <code>if</code>).' };
+  }},
+  { tipo:'IndentationError', re:/expected an indented block after ['"]?(\w+)/, build(m){
+    return { titulo:'Falta sangría (indentación) después de :',
+      cuerpo:`Después de la línea que termina en dos puntos de tu <code>${m[1]}</code>, Python espera que la siguiente línea esté indentada (con espacios). Revisa que el bloque que sigue tenga sangría.` };
+  }},
+  { tipo:'SyntaxError', re:/expected an indented block after ['"]?(\w+)/, build(m){
+    return { titulo:'Falta sangría (indentación) después de :',
+      cuerpo:`Después de la línea que termina en dos puntos de tu <code>${m[1]}</code>, Python espera que la siguiente línea esté indentada (con espacios). Revisa que el bloque que sigue tenga sangría.` };
+  }},
+  { tipo:'IndentationError', re:/unexpected indent/, build(){
+    return { titulo:'Sangría donde no se esperaba',
+      cuerpo:'Esta línea tiene más espacios al inicio de los que Python esperaba en este punto. Revisa que la indentación sea consistente con las líneas anteriores.' };
+  }},
+  { tipo:'IndentationError', re:/unindent does not match/, build(){
+    return { titulo:'La sangría no coincide',
+      cuerpo:'Estás mezclando distintas cantidades de espacios para indentar. Todas las líneas de un mismo bloque deben tener exactamente la misma sangría.' };
+  }},
+  { tipo:'SyntaxError', re:/expected ':'/, build(){
+    return { titulo:"Falta un ':' al final de la línea",
+      cuerpo:'Las líneas que abren un bloque (<code>if</code>, <code>for</code>, <code>while</code>, <code>def</code>, <code>else</code>, <code>elif</code>) deben terminar con dos puntos. Revisa el final de la línea marcada.' };
+  }},
+  { tipo:'SyntaxError', re:/invalid decimal literal/, build(){
+    return { titulo:'Número mal escrito',
+      cuerpo:'Parece que hay un número con algo pegado que Python no puede interpretar (por ejemplo, letras justo después de dígitos). Revisa la línea marcada.' };
+  }},
+  { tipo:'SyntaxError', re:/.*/, build(){
+    return { titulo:'Error de sintaxis (de escritura) en esta línea',
+      cuerpo:'Python no pudo entender esta línea tal como está escrita. Revisa con cuidado paréntesis, comillas, dos puntos y la ortografía de palabras clave como <code>if</code>, <code>for</code>, <code>def</code> o <code>print</code>.' };
+  }},
+
+  // ── NameError / UnboundLocalError ──
+  { tipo:'NameError', re:/name '(.+?)' is not defined/, build(m){
+    return { titulo:`La variable <code>${m[1]}</code> no existe (todavía)`,
+      cuerpo:`Python no reconoce el nombre <code>${m[1]}</code>. Esto suele pasar porque no la creaste antes de usarla, hay un error de escritura (mayúsculas/minúsculas cuentan), o la creaste dentro de una función y la usas fuera de ella.` };
+  }},
+  { tipo:'UnboundLocalError', re:/(?:cannot access local variable '(.+?)'|local variable '(.+?)' referenced before assignment)/, build(m){
+    const v = m[1]||m[2];
+    return { titulo:`Usaste <code>${v}</code> antes de darle un valor`,
+      cuerpo:`Dentro de esta función, intentas usar <code>${v}</code> antes de asignarle un valor en esa misma función. Si quieres usar una variable externa, revisa si necesitas pasarla como argumento.` };
+  }},
+
+  // ── TypeError ──
+  { tipo:'TypeError', re:/can only concatenate str \(not "(\w+)"\) to str/, build(m){
+    return { titulo:'Estás combinando texto y números con +',
+      cuerpo:`El operador <code>+</code> no puede unir directamente un texto (str) con ${tipoEsp(m[1])}. Convierte el valor a texto con <code>str(...)</code>, o mejor usa un f-string: <code>f"...{variable}..."</code>.` };
+  }},
+  { tipo:'TypeError', re:/unsupported operand type\(s\) for (.+?): '(\w+)' and '(\w+)'/, build(m){
+    return { titulo:`No se puede usar "${m[1]}" entre esos tipos`,
+      cuerpo:`El operador <code>${m[1]}</code> no funciona entre ${tipoEsp(m[2])} y ${tipoEsp(m[3])}. Revisa si necesitas convertir alguno de los dos con <code>int()</code>, <code>float()</code> o <code>str()</code>.` };
+  }},
+  { tipo:'TypeError', re:/'(\w+)' object is not subscriptable/, build(m){
+    return { titulo:'Usaste [ ] sobre algo que no lo permite',
+      cuerpo:`Ese valor es ${tipoEsp(m[1])} y no se puede indexar con corchetes <code>[ ]</code>. Eso solo funciona con listas, cadenas, tuplas o diccionarios.` };
+  }},
+  { tipo:'TypeError', re:/'(\w+)' object is not callable/, build(m){
+    return { titulo:'Estás usando algo como si fuera una función',
+      cuerpo:`Pusiste paréntesis <code>()</code> después de un valor que es ${tipoEsp(m[1])}, no una función. Revisa si reutilizaste un nombre (por ejemplo, una variable llamada igual que <code>str</code> o <code>list</code>).` };
+  }},
+  { tipo:'TypeError', re:/takes (\d+) positional arguments? but (\d+) (?:was|were) given/, build(m){
+    return { titulo:'Número incorrecto de argumentos',
+      cuerpo:`La función espera <code>${m[1]}</code> argumento(s), pero le estás pasando <code>${m[2]}</code>. Revisa cuántos valores necesita al llamarla.` };
+  }},
+  { tipo:'TypeError', re:/missing \d+ required positional argument/, build(m,msg){
+    const arg = (msg.match(/argument:\s*'(.+?)'/)||[])[1];
+    return { titulo:'Falta pasarle un argumento a la función',
+      cuerpo:`A la función le falta el argumento${arg?` <code>${arg}</code>`:''}. Revisa que estés pasando todos los valores que la función necesita, en el orden correcto.` };
+  }},
+  { tipo:'TypeError', re:/.*/, build(){
+    return { titulo:'Problema de tipos de datos',
+      cuerpo:'Estás combinando u operando valores que no son compatibles entre sí (por ejemplo, texto y número). Revisa el tipo de cada variable con <code>type(variable)</code>.' };
+  }},
+
+  // ── ValueError ──
+  { tipo:'ValueError', re:/invalid literal for int\(\) with base 10: '(.*)'/, build(m){
+    return { titulo:`"${m[1]}" no se puede convertir a número entero`,
+      cuerpo:'La función <code>int(...)</code> solo funciona si el texto contiene únicamente dígitos (y opcionalmente un signo). Revisa que el valor no tenga letras, espacios extra o esté vacío.' };
+  }},
+  { tipo:'ValueError', re:/could not convert string to float: '(.*)'/, build(m){
+    return { titulo:`"${m[1]}" no se puede convertir a número decimal`,
+      cuerpo:'La función <code>float(...)</code> necesita un texto que represente un número. Revisa que no tenga letras ni esté vacío.' };
+  }},
+  { tipo:'ValueError', re:/.*/, build(){
+    return { titulo:'El valor no es válido para lo que intentas hacer',
+      cuerpo:'Uno de los valores que estás usando no tiene el formato que esta operación necesita. Revisa el dato justo antes de la línea marcada.' };
+  }},
+
+  // ── Otros errores comunes ──
+  { tipo:'ZeroDivisionError', re:/.*/, build(){
+    return { titulo:'Estás dividiendo entre cero',
+      cuerpo:'En matemáticas (y en Python) no se puede dividir ningún número entre 0. Revisa el divisor antes de hacer la división, por ejemplo comprobando que no sea 0 con un <code>if</code>.' };
+  }},
+  { tipo:'IndexError', re:/.*/, build(){
+    return { titulo:'Esa posición no existe en la lista',
+      cuerpo:'Intentas acceder a un índice que no existe. Recuerda que las listas y cadenas empiezan en el índice <code>0</code>, así que una lista de N elementos tiene índices válidos de <code>0</code> a <code>N-1</code>.' };
+  }},
+  { tipo:'KeyError', re:/.*/, build(m,msg){
+    return { titulo:'Esa llave (key) no existe en el diccionario',
+      cuerpo:`No existe la llave <code>${msg}</code> en ese diccionario. Revisa cómo la escribiste (mayúsculas, espacios, comillas) o si realmente la agregaste antes.` };
+  }},
+  { tipo:'AttributeError', re:/'(\w+)' object has no attribute '(.+?)'/, build(m){
+    return { titulo:`Ese valor no tiene <code>.${m[2]}</code>`,
+      cuerpo:`Intentaste usar <code>.${m[2]}</code> sobre un valor que es ${tipoEsp(m[1])}, pero ese tipo de dato no tiene ese método o atributo. Revisa el tipo de la variable con <code>type(variable)</code> y que el nombre esté bien escrito.` };
+  }},
+  { tipo:'ModuleNotFoundError', re:/No module named '(.+?)'/, build(m){
+    return { titulo:`El módulo "${m[1]}" no está disponible aquí`,
+      cuerpo:'Este Playground corre Python en tu navegador (con Pyodide) y no todas las bibliotecas están instaladas. Revisa el nombre del módulo o consulta con tu profesor si esta librería está disponible en este entorno.' };
+  }},
+  { tipo:'RecursionError', re:/.*/, build(){
+    return { titulo:'Tu función se está llamando a sí misma sin parar',
+      cuerpo:'Esto pasa cuando una función se llama a sí misma (recursión) pero nunca llega a un caso base que la detenga. Revisa que exista una condición de salida clara.' };
+  }},
+];
+
+function parseTraceback(rawMessage){
+  const raw = (rawMessage || '').trim();
+  const rawLines = raw.split('\n');
+  const tbIndex = rawLines.findIndex(l => l.includes('Traceback'));
+  const display = tbIndex !== -1 ? rawLines.slice(tbIndex).join('\n') : raw;
+  const displayLines = display.split('\n');
+
+  let line = null;
+  const fileLineRe = /File "[^"]*", line (\d+)/;
+  for(const l of displayLines){
+    const m = l.match(fileLineRe);
+    if(m) line = parseInt(m[1], 10);
+  }
+
+  let tipo = null, mensaje = '';
+  for(let i = displayLines.length - 1; i >= 0; i--){
+    const l = displayLines[i].trim();
+    if(!l) continue;
+    const m = l.match(/^([A-Za-z_][\w.]*)\s*:\s*(.*)$/);
+    if(m){ tipo = m[1]; mensaje = m[2]; break; }
+    const m2 = l.match(/^([A-Za-z_][\w.]*(?:Error|Exception|Warning))$/);
+    if(m2){ tipo = m2[1]; mensaje = ''; break; }
+  }
+
+  return { raw: display, line, tipo, mensaje };
+}
+
+function analizarError(rawMessage){
+  const info = parseTraceback(rawMessage);
+  if(!info.tipo){
+    return { line: info.line, raw: info.raw,
+      titulo: 'Ocurrió un error inesperado',
+      cuerpo: 'No pudimos reconocer el tipo de error. Revisa el mensaje técnico de Python para más detalles.' };
+  }
+  const candidato = PATRONES.find(p => p.tipo === info.tipo && p.re.test(info.mensaje));
+  if(candidato){
+    const m = info.mensaje.match(candidato.re);
+    const { titulo, cuerpo } = candidato.build(m, info.mensaje);
+    return { line: info.line, raw: info.raw, titulo, cuerpo, tipoPython: info.tipo };
+  }
+  return { line: info.line, raw: info.raw, tipoPython: info.tipo,
+    titulo: `Ocurrió un error de tipo ${info.tipo}`,
+    cuerpo: `Mensaje original de Python: <code>${info.mensaje || '(sin mensaje)'}</code>. Revisa la línea marcada e intenta identificar qué instrucción está causando el problema.` };
+}
+
+function appendErrorCard(analisis){
+  const placeholder = consoleOutput.querySelector('.placeholder-text');
+  if(placeholder) placeholder.remove();
+
+  const card = document.createElement('div');
+  card.className = 'error-card';
+
+  const lineChip = analisis.line != null
+    ? `<button class="error-line-chip" type="button">📍 Línea ${analisis.line}</button>` : '';
+
+  card.innerHTML = `
+    <div class="error-card-head">
+      <span class="error-badge">✕ ${analisis.tipoPython || 'Error'}</span>
+      ${lineChip}
+    </div>
+    <div class="error-card-title">${analisis.titulo}</div>
+    <div class="error-card-body">${analisis.cuerpo}</div>
+    <button class="error-toggle-raw" type="button">Ver mensaje técnico original de Python ▾</button>
+    <pre class="error-raw hidden"></pre>
+  `;
+
+  const raw = card.querySelector('.error-raw');
+  raw.textContent = analisis.raw;
+
+  const toggleBtn = card.querySelector('.error-toggle-raw');
+  toggleBtn.addEventListener('click', () => {
+    const hidden = raw.classList.toggle('hidden');
+    toggleBtn.textContent = hidden
+      ? 'Ver mensaje técnico original de Python ▾'
+      : 'Ocultar mensaje técnico original de Python ▴';
+  });
+
+  if(analisis.line != null){
+    const chip = card.querySelector('.error-line-chip');
+    chip.addEventListener('click', () => jumpToLine(analisis.line));
+  }
+
+  consoleOutput.appendChild(card);
+  consoleOutput.scrollTop = consoleOutput.scrollHeight;
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // RUN CODE
 // ═══════════════════════════════════════════════════════════════════
 async function runCode(){
-  if(!pyodideReady) return;
-  const code = document.getElementById('code-editor').value;
+  if(!pyodideReady || !pyWorker) return;
+  const code = editorEl.value;
   if(!code.trim()){
     appendErrorBlock('⚠ El editor está vacío. Escribe algo de código primero.');
     return;
   }
 
+  setErrorLine(null);
   btnRun.disabled = true;
+  btnResetPython.disabled = true;
   btnRun.textContent = '⏳ Ejecutando...';
 
   // Visual separator for this run
@@ -319,23 +1035,29 @@ async function runCode(){
   if(placeholder) placeholder.remove();
   consoleOutput.appendChild(sep);
 
-  try{
-    await pyodide.runPythonAsync(code);
-  }catch(err){
-    // Extract the friendliest part of the Python traceback: the last line(s)
-    const raw = err.message || String(err);
-    const lines = raw.trim().split('\n');
-    // Try to grab from "Traceback" onward if present, else show full message
-    let display = raw;
-    const tbIndex = lines.findIndex(l => l.includes('Traceback'));
-    if(tbIndex !== -1){
-      display = lines.slice(tbIndex).join('\n');
+  // El código que usa input() corre en el hilo principal (necesita window.prompt,
+  // que no existe en un Worker). Todo lo demás corre en el Worker, así se puede
+  // detener con un clic si se queda pegado en un bucle infinito.
+  const usaInput = /\binput\s*\(/.test(code);
+
+  if(usaInput){
+    try{
+      await pyodide.runPythonAsync(code);
+    }catch(err){
+      const analisis = analizarError(err.message || String(err));
+      appendErrorCard(analisis);
+      setErrorLine(analisis.line);
+    }finally{
+      btnRun.disabled = false;
+      btnResetPython.disabled = false;
+      btnRun.textContent = '▶ Run';
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
-    appendErrorBlock(display);
-  }finally{
-    btnRun.disabled = false;
-    btnRun.textContent = '▶ Run';
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+  }else{
+    btnStop.classList.remove('hidden');
+    pyWorker.postMessage({ type: 'run', code });
+    // El resto se resuelve de forma asíncrona en mainWorkerHandler()
+    // (mensajes 'stdout' / 'stderr' / 'done' / 'error' del Worker).
   }
 }
 
@@ -380,17 +1102,61 @@ print("Hola, mundo"`,
 
   error_tipo: `# Este código tiene un TypeError a propósito
 edad = 20
-print("Tengo " + edad + " años")`
+print("Tengo " + edad + " años")`,
+
+  bucle: `# Bucle for: recorre una secuencia de números
+for i in range(1, 6):
+    print(f"Vuelta número {i}")
+
+# Bucle while: se repite mientras la condición sea verdadera
+contador = 0
+while contador < 3:
+    print("Contando:", contador)
+    contador += 1`,
+
+  funcion: `# Una función agrupa código que puedes reutilizar
+def saludar(nombre):
+    return f"¡Hola, {nombre}!"
+
+mensaje = saludar("Karla")
+print(mensaje)
+print(saludar("Luis"))`,
+
+  lista: `frutas = ["manzana", "plátano", "uva"]
+
+print("Tengo", len(frutas), "frutas")
+print("La primera es:", frutas[0])
+
+frutas.append("mango")
+for fruta in frutas:
+    print("-", fruta)`,
+
+  error_nombre: `# Este código tiene un NameError a propósito
+# Usamos una variable que nunca se creó - ¿puedes encontrarla?
+print(f"Tu edad es {edad}")`,
+
+  error_indice: `# Este código tiene un IndexError a propósito
+numeros = [10, 20, 30]
+print(numeros[5])`,
+
+  error_cero: `# Este código tiene un ZeroDivisionError a propósito
+total = 10
+personas = 0
+print(total / personas)`
 };
 
 function loadExample(key){
-  document.getElementById('code-editor').value = examples[key];
+  editorEl.value = examples[key];
+  setErrorLine(null);
+  renderSyntaxHighlight();
   clearConsole();
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════
+renderLineNumbers();
+renderSyntaxHighlight();
 initPyodide();
 </script>
 </body>
