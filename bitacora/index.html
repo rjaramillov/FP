@@ -548,7 +548,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 /* ================== TEMARIO ================== */
-/* Unidad II y III: agregar aquí cuando se tengan las preguntas reales de cada sesión. */
+/* Unidad III: agregar aquí cuando se tengan las preguntas reales de cada sesión.
+   Las preguntas se pueden ajustar ANTES de que se imparta la sesión (las respuestas se guardan por posición). */
 const TEMARIO = {
   unidad1: {
     nombre: "Unidad I — Introducción y Conceptos Básicos",
@@ -590,7 +591,51 @@ const TEMARIO = {
       ]},
     ]
   },
-  unidad2: { nombre:"Unidad II — Estructuras Repetitivas y Datos Lineales", entradas:[] },
+  unidad2: {
+    nombre:"Unidad II — Estructuras Repetitivas y Datos Lineales",
+    entradas: [
+      { id:"s9", sesion:"Sesión 9", tema:"Bucles for", preguntas:[
+        "En el visualizador, una línea terminó con contador ×0. ¿Cuál fue y por qué nunca se ejecutó?",
+        "Copia la línea de tu tabla de multiplicar que va DENTRO del for y la que va FUERA. ¿Por qué cada una está en su lugar?",
+        "En las pausas de «predice», ¿fallaste alguna? ¿Qué creías que iba a pasar y qué pasó en realidad?"
+      ]},
+      { id:"s10", sesion:"Sesión 10", tema:"Bucles while", preguntas:[
+        "En el bucle infinito, intentos valía 0 después de muchas vueltas. ¿Qué línea faltaba o estaba mal colocada?",
+        "En tu promedio con centinela, ¿por qué el -1 no se suma? Copia la línea que lo evita.",
+        "Da un ejemplo de tu vida diaria que sea for (sabes cuántas veces) y otro que sea while (no lo sabes)."
+      ]},
+      { id:"s11", sesion:"Sesión 11", tema:"Arreglos y Listas", preguntas:[
+        "Python cuenta las posiciones desde 0. Si una lista tiene 5 elementos, ¿cuál es el índice del último? ¿Te equivocaste con esto hoy?",
+        "¿Qué mensaje te dio Python al usar un índice que no existía? Cópialo y explica con tus palabras qué significa.",
+        "¿Qué colección de datos de tu vida diaria guardarías en una lista? Escribe cómo se vería en Python."
+      ]},
+      { id:"s12", sesion:"Sesión 12", tema:"Listas Enlazadas", preguntas:[
+        "Explica con tus palabras la diferencia entre un arreglo (casillas juntas en memoria) y una lista enlazada (nodos que apuntan al siguiente).",
+        "Si necesitas insertar un elemento a la mitad, ¿cuál de las dos estructuras hace menos trabajo? ¿Por qué?",
+        "¿Qué situación de tu vida diaria se parece más a un arreglo, y cuál a una lista enlazada?"
+      ]},
+      { id:"s13", sesion:"Sesión 13", tema:"Recorridos y Búsquedas", preguntas:[
+        "Para encontrar el mismo dato, ¿cuántas comparaciones hizo la búsqueda secuencial y cuántas la binaria? ¿Por qué la diferencia?",
+        "¿Por qué la búsqueda binaria no funciona en una lista desordenada? Explícalo con un ejemplo de números.",
+        "¿En qué situación de tu vida diaria «divides a la mitad» para buscar algo?"
+      ]},
+      { id:"s14", sesion:"Sesión 14", tema:"Ordenamiento y Validación", preguntas:[
+        "¿Qué algoritmo usaste en tu actividad, selección o inserción? ¿En qué se diferencia del otro?",
+        "En la Unidad I alguien preguntó qué hacer cuando escriben «SI, Si, Sí, si, sí». ¿Qué hiciste para que tu programa aceptara todas esas formas? Copia la línea.",
+        "¿Qué dato de un sistema real (inscripciones, compras, citas) necesitarías validar? ¿Con qué regla?"
+      ]},
+      { id:"s15", sesion:"Sesión 15", tema:"Reto Final — Parte 1", preguntas:[
+        "¿Planeaste antes de programar (lista de pasos, pseudocódigo o diagrama) o empezaste directo en el Playground? ¿Cómo te fue?",
+        "¿Qué requisito del Reto Final ya te funciona y cuál te falta? ¿Qué te está costando más?",
+        "¿Qué tema de la Unidad II (bucles, listas, búsqueda, ordenamiento o validación) sientes más débil para terminar el reto?"
+      ]},
+      { id:"s16", sesion:"Sesión 16", tema:"Reto Final — Parte 2 (cierre de unidad)", preguntas:[
+        "De la Sesión 9 a hoy, ¿qué fue lo más difícil de la Unidad II? ¿Cómo lo superaste?",
+        "¿Con qué datos probaste tu Reto Final antes de entregarlo? ¿Encontraste algún error gracias a esas pruebas?",
+        "¿Qué esperas aprender en la Unidad III?"
+      ]},
+    ]
+  },
   unidad3: { nombre:"Unidad III — Funciones y Librerías", entradas:[] },
 };
 
