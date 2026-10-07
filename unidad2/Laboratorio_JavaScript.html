@@ -2612,7 +2612,7 @@ else {
     }
     var comp = META.filter(function (q) { return q.sec === "comp"; }), meta = META.filter(function (q) { return q.sec === "meta"; });
     main.innerHTML = "<div class='eyebrow'>Cierre</div><h2 class='vista-titulo'>Reflexión final: Python vs JavaScript</h2>" +
-      "<div class='objetivo'><b>💭 Tu opinión es muy valiosa.</b> No hay respuestas correctas ni incorrectas: <b>no se califica qué lenguaje prefieras</b>, sino que contestes todo y expliques tus razones con ejemplos propios. Tus respuestas sinceras sirven para mejorar el curso y decidir con qué lenguaje se enseñará en el futuro.</div>" +
+      "<div class='objetivo'><b>💭 Tu opinión es muy valiosa.</b> No hay respuestas correctas ni incorrectas, y no afectan tu calificación: tus respuestas sinceras sirven para mejorar el curso y decidir con qué lenguaje se enseñará en el futuro.</div>" +
       "<div class='seccion'><h3><span class='num'>A</span>Comparación entre lenguajes</h3>" + comp.map(qHTML).join("") + "</div>" +
       "<div class='seccion'><h3><span class='num'>B</span>Tu proceso de aprendizaje</h3>" + meta.map(function (q, i) { return qHTML(q, i + comp.length); }).join("") + "</div>" +
       "<div class='seccion'><h3><span class='num'>C</span>Declaración de uso de Inteligencia Artificial Generativa</h3><p style='margin-top:0'>De acuerdo con los Lineamientos para el uso de la IAG en la Universidad de Colima (Acuerdo No. 23 de 2024), declara si usaste IA para resolver las actividades de este laboratorio.</p>" +
