@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reto final · Huella de Carbono de mi Comunidad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --grafito:#12141C; --papel:#FAFAF9; --indigo:#3B5BFB; --indigo-d:#2A44C9; --indigo-t:#EEF1FF;
+    --teal:#0E9E8F; --teal-d:#0A6F64; --teal-t:#E7F6F4; --ambar:#E8992A; --ambar-d:#8A5200; --ambar-t:#FDF1DE;
+    --pizarra:#67707F; --soft:#4E5664; --line:#DADDE3; --gris:#EEF1F6; --rojo:#B3261E; --rojo-t:#FBEAE8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0B0C11;overflow:hidden}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;color:var(--grafito);-webkit-font-smoothing:antialiased}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #deck{position:relative;flex:none;width:1920px;height:1080px;transform-origin:center center;background:var(--papel);overflow:hidden;box-shadow:0 0 0 1px #000}
+  .slide{position:absolute;inset:0;padding:84px 110px 120px;display:none;flex-direction:column;gap:36px;background:var(--papel)}
+  .slide.active{display:flex}
+  .slide.dark{background:var(--grafito);color:var(--papel)}
+  .slide.accent{background:var(--indigo);color:var(--papel)}
+  .slide.alt{background:var(--gris)}
+  h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif;letter-spacing:-.01em;line-height:1.1}
+  h1{font-size:112px;font-weight:700}
+  h2{font-size:64px;font-weight:700}
+  h3{font-size:40px;font-weight:600}
+  p,li,td,th{font-size:32px;line-height:1.4}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:var(--indigo);font-weight:500}
+  .dark .eyebrow,.accent .eyebrow{color:#C9D3FF}
+  .soft{color:var(--soft)} .dark .soft{color:#C3C8D1} .accent .soft{color:#E3E8FF}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-ligatures:none;font-feature-settings:'liga' 0,'calt' 0}
+  .grid2>*,.grid3>*{min-width:0}
+  .head{display:flex;flex-direction:column;gap:12px}
+  .row{display:flex;gap:28px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:34px 38px;display:flex;flex-direction:column;gap:14px}
+  .card.i{background:var(--indigo-t);border-color:transparent} .card.t{background:var(--teal-t);border-color:transparent} .card.a{background:var(--ambar-t);border-color:transparent} .card.r{background:var(--rojo-t);border-color:transparent}
+  .card.dash{border:3px dashed #9DB0FF}
+  p.card{display:block}
+  .card h3.i{color:var(--indigo-d)} .card h3.t{color:var(--teal-d)} .card h3.a{color:var(--ambar-d)} .card h3.r{color:var(--rojo)}
+  .pill{display:inline-block;background:var(--indigo-t);border-radius:14px;padding:14px 24px}
+  .q{background:#fff;border-left:8px solid var(--indigo);border-radius:14px;padding:18px 26px;font-size:32px}
+  .q.ans{border-left-color:var(--teal);background:var(--teal-t)}
+  .big{font-family:'Space Grotesk';font-weight:700;font-size:96px;line-height:1}
+  .spacer{flex:1}
+  .pwcard{border:2px solid var(--grafito);border-radius:18px;padding:34px 20px;text-align:center;font:600 48px 'JetBrains Mono';font-variant-ligatures:none;background:#fff}
+  td.si,p.si{color:#0A6F64;font-weight:600} td.no,p.no{color:#B3261E;font-weight:600}
+  .tree{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .trow{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+  .tnode{border:2px solid var(--grafito);border-radius:14px;padding:16px 26px;font:600 28px 'JetBrains Mono';text-align:center;background:#fff}
+  .tnode span{display:block;font:400 22px 'IBM Plex Sans';color:var(--soft);margin-top:4px}
+  .tnode.a{border-color:var(--ambar);background:var(--ambar-t)} .tnode.i{border-color:var(--indigo);background:var(--indigo-t)} .tnode.t{border-color:var(--teal);background:var(--teal-t)}
+  .tlink{font:700 30px 'IBM Plex Sans';color:var(--soft)}
+  .chars{display:flex;gap:14px;justify-content:center}
+  .chars span{position:relative;width:110px;height:120px;border:3px solid var(--grafito);border-radius:14px;display:flex;align-items:center;justify-content:center;font:700 60px 'JetBrains Mono';background:#fff}
+  .chars span.dg{border-color:var(--teal);background:var(--teal-t)}
+  .chars i{position:absolute;bottom:-38px;font:500 22px 'JetBrains Mono';font-style:normal;color:var(--soft)}
+  .soft2{font:600 24px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:8px}
+  pre.code .cl{display:block;min-height:1.45em;border-radius:6px;margin:0 -10px;padding:0 10px;transition:background .25s, box-shadow .25s}
+  pre.code .cg.step{display:block}
+  pre.code .cl.now{background:rgba(232,153,42,.30);box-shadow:inset 6px 0 0 #E8992A}
+  i.ptr{display:none}
+  .bar{display:flex;height:70px;border-radius:12px;overflow:hidden;font:600 24px 'JetBrains Mono';font-variant-ligatures:none}
+  .bar span{display:flex;align-items:center;justify-content:center;white-space:nowrap;color:#fff}
+  .bar .b1{background:var(--indigo)} .bar .b2{background:var(--teal)} .bar .b3{background:var(--ambar);color:var(--grafito)}
+  .barlbl{display:flex;font:500 24px 'IBM Plex Sans';color:var(--soft);margin-top:8px} .barlbl span{text-align:center}
+  .consola{background:#0B0D14;color:#C9F2D9;border-radius:16px;padding:22px 26px;font:400 24px/1.55 'JetBrains Mono';font-variant-ligatures:none;white-space:pre-wrap}
+  .consola .pr{display:block;color:#8E97A8}
+  .map2{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
+  .mrow{display:grid;grid-template-columns:150px 1fr 1fr;gap:16px;align-items:center}
+  .marr{display:grid;grid-template-columns:150px 1fr 1fr;gap:16px;font:700 26px 'IBM Plex Sans';color:var(--soft)} .marr span:first-child{grid-column:2}
+  .mlbl{font:600 22px 'JetBrains Mono';color:var(--soft)}
+  .mbox{border:2px solid var(--grafito);border-radius:12px;padding:10px 0;text-align:center;font:600 28px 'JetBrains Mono';background:#fff}
+  .mbox.t{border-color:var(--teal);background:var(--teal-t)} .mbox.r{border-color:#B3261E;background:#FBE9E7}
+  .filemap{display:flex;flex-direction:column;gap:10px}
+  .fm{border-radius:12px;padding:14px 20px;font:500 26px 'JetBrains Mono';border:2px solid var(--indigo);background:var(--indigo-t)}
+  .fm.a{border-color:var(--ambar);background:var(--ambar-t);font-family:'IBM Plex Sans';font-weight:700;margin-top:10px}
+
+  .tight td,.tight th{padding:9px 16px;font-size:25px;line-height:1.3}
+  .tight td.mono{font-size:23px}
+  .pausa{display:inline-flex;align-self:flex-start;align-items:center;gap:10px;background:var(--ambar);color:var(--grafito);font:700 24px 'IBM Plex Sans';border-radius:999px;padding:8px 22px}
+  .saberes{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;align-items:start}
+  .sab{border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid var(--line);border-top:10px solid var(--indigo)}
+  .sab:nth-child(2){border-top-color:var(--teal)} .sab:nth-child(3){border-top-color:var(--ambar)} .sab:nth-child(4){border-top-color:#9B59B6} .sab:nth-child(5){border-top-color:var(--grafito)}
+  .sab span{font:700 40px 'Space Grotesk'} .sab p{font-size:31px;line-height:1.35;color:var(--soft)}
+  .flow{display:flex;align-items:center;gap:16px}
+  .fbox{background:#fff;border:2px solid var(--grafito);border-radius:14px;padding:14px 22px;font-size:28px;font-family:'JetBrains Mono';font-variant-ligatures:none}
+  .fbox.i{background:var(--indigo-t);border-color:var(--indigo)} .fbox.t{background:var(--teal-t);border-color:var(--teal)} .fbox.a{background:var(--ambar-t);border-color:var(--ambar);font-family:'IBM Plex Sans'}
+  .farr{font:700 28px 'IBM Plex Sans';color:var(--soft)}
+  .sm p{font-size:28px}
+  b,strong{font-weight:700}
+  .hl{background:#FFE7B8;border-radius:6px;padding:0 6px}
+  .dark .hl{background:#5A4415;color:#FFE7B8}
+
+  /* revelado paso a paso */
+  .step{opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease}
+  .step.on{opacity:1;transform:none}
+  .step-blur{position:relative}
+  .step-blur pre{transition:filter .4s ease}
+  .step-blur:not(.on) pre{filter:blur(16px)}
+  .step-blur:not(.on) .copy{display:none}
+  .step-blur:not(.on)::after{content:"Primero inténtalo tú en el Playground · clic para ver la solución";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;font-family:'IBM Plex Sans';font-size:34px;font-weight:700;color:#fff;background:rgba(18,20,28,.35);border-radius:20px}
+  .step-hl{transition:background .3s ease, box-shadow .3s ease}
+  .step-hl.on{background:#FFE7B8 !important;box-shadow:inset 0 0 0 3px var(--ambar)}
+  @media (prefers-reduced-motion: reduce){ .step,.step-blur,.step-hl{transition:none} }
+
+  /* código */
+  .code{font-variant-ligatures:none;font-feature-settings:'liga' 0,'calt' 0;background:var(--grafito);color:#E9ECF2;border-radius:20px;padding:26px 30px;font-family:'JetBrains Mono',monospace;font-size:25px;line-height:1.42;white-space:pre;overflow:hidden;position:relative}
+  .code .kw{color:#9DB0FF;font-weight:700} .code .bi{color:#5FD3C4} .code .st{color:#F2B866} .code .cm{color:#9AA2AE;font-style:italic} .code .nu{color:#F59BB7}
+  .codewrap{position:relative;display:flex;flex-direction:column}
+  .copy{position:absolute;top:14px;right:16px;z-index:3;background:#2A2E3D;color:#E9ECF2;border:1px solid #3B4152;border-radius:10px;font:600 20px 'IBM Plex Sans';padding:8px 14px;cursor:pointer}
+  .copy:hover{background:#3B4152}
+  .term-win{background:#0F1117;color:#D7F5E9;border-radius:18px;padding:24px 30px;font-family:'JetBrains Mono',monospace;font-size:26px;line-height:1.5;white-space:pre;border:1px solid #2A2E3D}
+  .term-win .u{color:#F2B866}
+
+  /* tablas */
+  table{border-collapse:collapse;width:100%}
+  th{font-family:'Space Grotesk';font-weight:600;text-align:left;background:var(--grafito);color:#fff;padding:12px 18px;font-size:28px}
+  td{padding:12px 18px;border-bottom:1px solid var(--line);font-size:28px;background:#fff}
+  td.mono, th.mono{font-family:'JetBrains Mono'}
+  tr td:first-child{font-weight:600}
+
+  /* mapa de bloques */
+  .map{display:flex;gap:18px;align-items:stretch}
+  .blk{flex:1;border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;border-top:8px solid var(--indigo);background:var(--indigo-t)}
+  .blk .n{font-family:'Space Grotesk';font-weight:700;font-size:40px;color:var(--indigo-d)}
+  .blk h3{font-size:32px}
+  .blk p{font-size:24px;font-family:'JetBrains Mono';color:var(--soft);line-height:1.35}
+  .blk.t{border-top-color:var(--teal);background:var(--teal-t)} .blk.t .n{color:var(--teal-d)}
+  .blk.a{border-top-color:var(--ambar);background:var(--ambar-t)} .blk.a .n{color:var(--ambar-d)}
+  .menubox{border:4px solid var(--grafito);border-radius:26px;padding:26px 28px 30px;display:flex;flex-direction:column;gap:18px;background:#fff}
+  .menubox .lbl{font-family:'JetBrains Mono';font-size:26px;font-weight:700}
+
+  /* chips de listas */
+  .chips{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .chip{font-variant-ligatures:none;font-family:'JetBrains Mono';font-size:28px;font-weight:700;background:var(--grafito);color:#fff;border-radius:12px;padding:10px 18px;transition:background .3s}
+  .chip.sw{background:var(--ambar);color:var(--grafito)}
+  .chip.ok{background:var(--teal)}
+  .pass{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:center;background:#fff;border-radius:16px;padding:16px 22px;border:1px solid var(--line)}
+  .pass .lab{font-family:'JetBrains Mono';font-size:26px;color:var(--soft)}
+
+  /* mini-mapa de progreso */
+  #minimap{position:absolute;top:30px;right:110px;display:none;gap:8px;z-index:5}
+  #minimap span{font-family:'JetBrains Mono';font-size:20px;font-weight:700;padding:6px 12px;border-radius:8px;background:#E4E7EE;color:#6B7280}
+  #minimap span.done{background:var(--teal-t);color:var(--teal-d)}
+  #minimap span.cur{background:var(--indigo);color:#fff}
+
+  /* barra inferior */
+  .foot{position:absolute;left:110px;right:110px;bottom:40px;display:flex;align-items:center;gap:18px;font-size:22px;color:var(--pizarra);z-index:4}
+  .foot img{height:40px;filter:brightness(0);opacity:.6}
+  .foot .sp{flex:1}
+  .dark .foot,.accent .foot{color:#C3C8D1}
+  #progress{position:absolute;left:0;bottom:0;height:8px;background:var(--indigo);transition:width .3s;z-index:6}
+
+  /* botones de término y referencia */
+  .term{background:none;border:none;font:inherit;color:var(--indigo-d);border-bottom:3px dotted var(--indigo);cursor:help;padding:0}
+  .dark .term,.accent .term{color:#C9D3FF;border-bottom-color:#C9D3FF}
+  .ref{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--indigo-t);color:var(--indigo-d);border:2px solid var(--indigo);font:700 16px 'JetBrains Mono';cursor:pointer;vertical-align:middle;margin-left:10px}
+
+  /* modal */
+  #modal{position:fixed;inset:0;background:rgba(12,13,18,.62);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  #modal.show{display:flex}
+  #modal .box{background:#fff;border-radius:18px;max-width:760px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+  #modal .mh{background:var(--grafito);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;gap:12px;align-items:center;position:sticky;top:0}
+  #modal .mh h4{font:700 24px 'Space Grotesk'}
+  #modal .mh button{background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1}
+  #modal .mb{padding:18px 22px 22px;font-size:20px;line-height:1.55;color:var(--grafito)}
+  #modal .mb p{font-size:20px;margin-bottom:10px}
+  #modal .mb pre{background:var(--grafito);color:#E9ECF2;border-radius:10px;padding:12px 14px;font:17px/1.5 'JetBrains Mono';overflow:auto;white-space:pre;margin:10px 0}
+  #modal .mb .apa{font-size:17px;color:var(--soft);border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+  #modal .mb .apa b{color:var(--grafito)}
+  #modal .full{font:15px/1.5 'JetBrains Mono';white-space:pre;background:var(--grafito);color:#E9ECF2;padding:14px;border-radius:10px;overflow:auto}
+
+  /* notas del profesor */
+  #notes{position:fixed;left:0;right:0;bottom:0;max-height:38vh;overflow:auto;background:#1B1E29;color:#E9ECF2;padding:16px 22px 20px;font-size:15px;line-height:1.55;z-index:40;display:none;border-top:3px solid var(--ambar)}
+  #notes.show{display:block}
+  #notes h5{font:700 13px 'JetBrains Mono';letter-spacing:2px;text-transform:uppercase;color:#F2B866;margin-bottom:6px}
+  #notes p{margin-bottom:6px}
+  #notes b{color:#fff}
+  aside.notes{display:none}
+
+  /* controles */
+  #ctrl{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;display:flex;gap:6px;z-index:45;opacity:.25;transition:opacity .2s}
+  #ctrl:hover,#ctrl:focus-within{opacity:1}
+  #ctrl button{background:#1B1E29;color:#fff;border:1px solid #3B4152;border-radius:8px;padding:8px 12px;font:600 13px 'IBM Plex Sans';cursor:pointer}
+  #ctrl button:focus-visible,.term:focus-visible,.ref:focus-visible,.copy:focus-visible{outline:3px solid var(--ambar);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+<div id="minimap" aria-hidden="true"></div>
+
+<!-- 1 -->
+<section class="slide dark" data-title="Portada">
+  <p class="eyebrow">Reto final · Fundamentos de Programación · Unidades I, II y III</p>
+  <div class="spacer"></div>
+  <h1 style="max-width:1600px">Huella de Carbono de mi Comunidad</h1>
+  <p style="font-size:44px;line-height:1.3;max-width:1500px" class="soft">Todo lo que aprendiste en el semestre, en un solo programa. No hay ninguna pieza nueva: solo piezas que ya armaste, juntas.</p>
+  <div class="spacer"></div>
+  <aside class="notes">
+    <p><b>[0:00]</b> Antes de entrar: hoja del reto impresa, una por alumno. Pide que <b>cierren la computadora y guarden el celular</b> hasta el momento 3.</p>
+    <p>🎙 «Hoy les presento el reto final. Antes de que se asusten: no les voy a pedir nada que no hayan hecho ya. Cada pieza de este programa ya la resolvieron en alguna práctica. Hoy las vamos a juntar, y hoy mismo, en esta clase, van a salir con la primera parte funcionando».</p>
+  </aside>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-title="Cómo va la clase">
+  <div class="head"><p class="eyebrow">Hoy · 2 horas</p><h2>Cuatro momentos; la computadora se abre hasta el tercero</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+    <div class="card i"><p class="mono" style="font-size:26px;color:var(--indigo-d)">25 min</p><h3>1 · El reto</h3><p class="soft">Qué vas a construir y cómo se califica.</p></div>
+    <div class="card a"><p class="mono" style="font-size:26px;color:var(--ambar-d)">35 min</p><h3>2 · En papel</h3><p class="soft">Entender, contratos y cálculo a mano.</p></div>
+    <div class="card t"><p class="mono" style="font-size:26px;color:var(--teal-d)">50 min</p><h3>3 · Nivel 1</h3><p class="soft">Programas la librería hasta ver todo en OK.</p></div>
+    <div class="card"><p class="mono" style="font-size:26px;color:var(--soft)">10 min</p><h3>4 · Cierre</h3><p class="soft">Qué sigue en casa y la entrega.</p></div>
+  </div>
+  <p class="q">🎯 La meta de hoy: que <b>todos</b> salgan del salón con el Nivel 1 funcionando. Eso ya es un 70 asegurado.</p>
+  <aside class="notes">
+    <p>🎙 «Fíjense en la meta: no es terminar todo hoy, es salir con la primera parte probada. Lo demás lo terminan en casa con calma, y es el mismo patrón del acopio».</p>
+  </aside>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-title="Los cinco saberes">
+  <div class="head"><p class="eyebrow">Lo que demuestras con este reto <button class="ref" data-term="modelo" aria-label="Referencia APA: Modelo Educativo 2026">APA</button></p><h2>Los cinco saberes en el reto</h2></div>
+  <div class="saberes">
+    <div class="sab"><span>Conocer</span><p>Funciones puras, listas, ciclos, decisiones y ordenamiento.</p></div>
+    <div class="sab"><span>Hacer</span><p>Resolver un problema completo, de la hoja en blanco al programa probado.</p></div>
+    <div class="sab"><span>Ser</span><p>Entregar algo que puedes explicar línea por línea porque es tuyo.</p></div>
+    <div class="sab"><span>Convivir</span><p>Comparar tus casos a mano con los de tu compañero antes de programar.</p></div>
+    <div class="sab"><span>Transformar</span><p>Medir el impacto de tu propia casa y saber dónde actuar.</p></div>
+  </div>
+  <aside class="notes"><p>🎙 «En Transformar: uno de los casos de prueba van a ser los consumos de su propia casa. Al final van a saber cuánto CO₂ produce su familia al mes y de dónde viene la mayor parte».</p></aside>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-title="El problema">
+  <div class="head"><p class="eyebrow">Momento 1 · El problema</p><h2>¿Cuánto CO₂ produce tu casa al mes?</h2></div>
+  <div class="grid2" style="grid-template-columns:1.05fr .95fr;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <p>El comité de tu colonia quiere una herramienta para medir la <button class="term" data-term="huella">huella de carbono</button> de cada familia y saber dónde conviene actuar.</p>
+      <div class="card i step"><h3 class="i">Por familia</h3><p>Registra luz, agua, gasolina y basura del mes; calcula cuántos kg de CO₂ producen, su nivel y su mayor fuente, con un consejo.</p></div>
+      <div class="card t step"><h3 class="t">Por comunidad</h3><p>Ordena a las familias de mayor a menor huella, saca el promedio y cuenta cuántas hay en cada nivel.</p></div>
+    </div>
+    <div class="consola step"><span class="pr">Opción: 1
+Familia: Rivera
+Luz del mes (kWh): 250
+Agua del mes (m³): 15
+Gasolina del mes (litros): 60
+Basura del mes (kg): 30</span>--- Rivera ---
+Luz:      125.0 kg (44.2%)
+Agua:     4.5 kg (1.6%)
+Gasolina: 138.0 kg (48.8%)
+Basura:   15.0 kg (5.3%)
+Huella total: 282.5 kg de CO2 al mes · Nivel Medio
+Tu mayor fuente es Gasolina: Comparte el auto,
+camina o usa el transporte público.</div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Esto es lo que hace el programa terminado. Fíjense que no hay nada raro: piden datos, hacen cuentas, deciden un nivel y muestran resultados. Lo mismo que el recibo de luz, pero con cuatro consumos».</p>
+    <p>Pregunta al grupo: «¿Qué creen que pese más en una casa de Colima: la luz o la gasolina?». Deja que apuesten; lo comprueban con su propia familia.</p>
+  </aside>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="Los datos del problema">
+  <div class="head"><p class="eyebrow">Momento 1 · Los datos</p><h2>Cuatro factores y tres escalones</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <table>
+        <tr><th>Consumo del mes</th><th>kg de CO₂ por unidad</th></tr>
+        <tr><td>Luz (kWh)</td><td class="mono">0.5</td></tr>
+        <tr><td>Agua (m³)</td><td class="mono">0.3</td></tr>
+        <tr><td>Gasolina (litros)</td><td class="mono">2.3</td></tr>
+        <tr><td>Basura (kg)</td><td class="mono">0.5</td></tr>
+      </table>
+      <p class="soft" style="font-size:24px">Factores simplificados con fines didácticos; los valores reales cambian según la fuente y el año.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <table>
+        <tr><th>Huella del mes (kg CO₂)</th><th>Nivel</th></tr>
+        <tr><td class="mono">hasta 150</td><td class="si">Bajo</td></tr>
+        <tr><td class="mono">más de 150 y hasta 300</td><td style="color:var(--ambar-d);font-weight:600">Medio</td></tr>
+        <tr><td class="mono">más de 300</td><td class="no">Alto</td></tr>
+      </table>
+      <p class="q step">Huella = luz + agua + gasolina + basura, <b>ya convertidos a kg de CO₂</b>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Igual que las tarifas de luz y del agua, estos números son datos del problema: no se discuten, se usan. Son simplificados para que las cuentas a mano sean fáciles».</p>
+    <p>Subraya «hasta 150» y «hasta 300»: el borde pertenece al escalón de abajo. Es la misma trampa del recibo del agua.</p>
+  </aside>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="No hay nada nuevo">
+  <div class="head"><p class="eyebrow">Momento 1 · Lo que ya sabes hacer</p><h2>Cada pieza del reto ya la resolviste</h2></div>
+  <table class="tight">
+    <tr><th>Parte del reto</th><th>Ya lo hiciste en…</th><th>Unidad</th></tr>
+    <tr class="step"><td>Pedir un consumo que no sea negativo</td><td><span class="mono">pedir_consumo</span> del recibo de luz y la validación del acopio</td><td class="mono">I · II</td></tr>
+    <tr class="step"><td>Convertir consumo a kg de CO₂</td><td><span class="mono">con_iva</span>: multiplicar por un factor y redondear</td><td class="mono">I · III</td></tr>
+    <tr class="step"><td>Clasificar en Bajo, Medio o Alto</td><td>los escalones de <span class="mono">consejo</span> y del recibo del agua</td><td class="mono">I · III</td></tr>
+    <tr class="step"><td>Encontrar la fuente mayor</td><td>«supón que el primero es el mayor y compara» del ordenamiento</td><td class="mono">II</td></tr>
+    <tr class="step"><td>Porcentaje sin dividir entre cero</td><td><span class="mono">diferencia</span> del recibo de luz</td><td class="mono">III</td></tr>
+    <tr class="step"><td>Menú que se repite y listas paralelas</td><td>el centro de acopio</td><td class="mono">II</td></tr>
+    <tr class="step"><td>Buscar una familia por nombre</td><td><span class="mono">buscar</span> del acopio</td><td class="mono">II</td></tr>
+    <tr class="step"><td>Ranking, promedio y conteo por nivel</td><td>el reporte del acopio: selección, acumuladores y contadores</td><td class="mono">II</td></tr>
+    <tr class="step"><td>Funciones puras con contrato, en una librería</td><td>contraseñas, línea de ensamble y recibo del agua</td><td class="mono">III</td></tr>
+  </table>
+  <aside class="notes">
+    <p>🎙 Ve renglón por renglón y pregunta antes de mostrar: «¿Dónde hicimos algo así?». Que ellos lo digan.</p>
+    <p>🎙 «Este reto no mide si memorizaron sintaxis; mide si pueden juntar lo que ya saben. Y lo que ya saben alcanza».</p>
+    <p>Lo único con nombre nuevo es <b>librería</b>: es poner todas las funciones puras juntas al inicio del archivo, separadas del programa que pide e imprime.</p>
+  </aside>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-title="Los niveles">
+  <div class="head"><p class="eyebrow">Momento 1 · Cómo se califica</p><h2>Tres niveles: cada uno se apoya en el anterior</h2></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr) .8fr;gap:20px;align-items:stretch">
+    <div class="card t"><p class="mono" style="font-size:26px;color:var(--teal-d)">hasta 70</p><h3>1 · La librería</h3><p class="soft" style="font-size:28px">Análisis, contratos, cálculo a mano y las 6 funciones puras con sus pruebas en OK.</p><p class="pausa" style="margin-top:auto">Se termina hoy en clase</p></div>
+    <div class="card i"><p class="mono" style="font-size:26px;color:var(--indigo-d)">hasta 85</p><h3>2 · El sistema</h3><p class="soft" style="font-size:28px">Menú, registro con validación y consulta de una familia.</p></div>
+    <div class="card a"><p class="mono" style="font-size:26px;color:var(--ambar-d)">hasta 100</p><h3>3 · La comunidad</h3><p class="soft" style="font-size:28px">Ranking de mayor a menor, promedio y familias por nivel.</p></div>
+    <div class="card dash"><p class="mono" style="font-size:26px;color:var(--indigo-d)">+5 extra</p><h3>⭐ JavaScript</h3><p class="soft" style="font-size:28px">La misma librería en JS, con sus pruebas. Tope: 100.</p></div>
+  </div>
+  <p class="q">Un nivel cuenta si funciona <b>y puedes explicarlo</b>. El lunes te haré una o dos preguntas sobre tu propio código.</p>
+  <aside class="notes">
+    <p>🎙 «El nivel 1 vale 70 y lo vamos a terminar hoy aquí. El que se lleva el nivel 1 funcionando ya aprobó el reto. Los niveles 2 y 3 son el menú y el reporte del acopio con otro tema».</p>
+    <p>Sobre la defensa: «No es para asustarlos. Es para que la calificación sea de ustedes. Si lo hicieron, lo explican en dos minutos».</p>
+  </aside>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-title="El método">
+  <div class="head"><p class="eyebrow">Momento 1 · Cómo se resuelve</p><h2>Cuatro pasos, en este orden</h2></div>
+  <div class="flow" style="justify-content:space-between">
+    <div class="card i step" style="flex:1"><p class="mono" style="color:var(--indigo-d);font-size:24px">PASO 1</p><h3>Entender</h3><p class="soft" style="font-size:27px">Entradas, proceso y salidas.</p></div><span class="farr step">→</span>
+    <div class="card i step" style="flex:1"><p class="mono" style="color:var(--indigo-d);font-size:24px">PASO 2</p><h3><button class="term" data-term="contrato">Contratos</button></h3><p class="soft" style="font-size:27px">Qué recibe y qué regresa cada función, con casos.</p></div><span class="farr step">→</span>
+    <div class="card a step" style="flex:1"><p class="mono" style="color:var(--ambar-d);font-size:24px">PASO 3</p><h3>A mano</h3><p class="soft" style="font-size:27px">Dos familias calculadas en papel.</p></div><span class="farr step">→</span>
+    <div class="card t step" style="flex:1"><p class="mono" style="color:var(--teal-d);font-size:24px">PASO 4</p><h3>Código</h3><p class="soft" style="font-size:27px">Solo al final, y se compara con el paso 3.</p></div>
+  </div>
+  <p class="q step">El artefacto del reto <b>no te deja saltarte pasos</b>: no se abre el código hasta que tus cuentas a mano cuadran.</p>
+  <aside class="notes">
+    <p>🎙 «Es el mismo método de las contraseñas. Si le piden a la IA el programa, se saltan los pasos 1, 2 y 3, que son justo los que les van a preguntar en el examen».</p>
+  </aside>
+</section>
+
+<!-- 9 -->
+<section class="slide accent" data-title="En papel" style="justify-content:center">
+  <p class="eyebrow">Momento 2 · 35 minutos</p>
+  <h1 style="font-size:96px">Computadora cerrada.<br>Hoja y lápiz.</h1>
+  <p style="font-size:40px" class="soft">Primero se piensa; después se escribe.</p>
+  <aside class="notes"><p><b>[0:25]</b> Confirma que todos tienen la hoja del reto. Que la llenen conforme avanzas: lado 1 (entender y contratos), lado 2 (a mano).</p></aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-title="Entender">
+  <div class="head"><p class="eyebrow">Paso 1 · Entender · en tu hoja</p><h2>¿Qué entra, qué se hace y qué sale?</h2></div>
+  <p class="pausa">✍ 5 minutos en tu hoja, luego compara con quien tienes al lado</p>
+  <div class="grid3">
+    <div class="card i step"><h3 class="i">Entradas</h3><p style="font-size:28px">Por familia: nombre, kWh de luz, m³ de agua, litros de gasolina y kg de basura.<br>Además: la opción del menú.</p></div>
+    <div class="card a step"><h3 class="a">Proceso</h3><p style="font-size:28px">Validar · convertir a CO₂ · sumar · clasificar · encontrar la mayor fuente · porcentajes · buscar · ordenar · promediar · contar.</p></div>
+    <div class="card t step"><h3 class="t">Salidas</h3><p style="font-size:28px">Desglose con porcentajes, huella total, nivel, mayor fuente y consejo.<br>Ranking, promedio y familias por nivel.</p></div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Escriban con sus palabras. Si no saben qué sale, no pueden saber qué programar».</p>
+    <p>Muestra las tarjetas solo después de que comparen en parejas (Convivir).</p>
+  </aside>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-title="Dividir">
+  <div class="head"><p class="eyebrow">Paso 1 · <button class="term" data-term="descomposicion">Dividir</button> el problema</p><h2>Dos partes: la librería y el programa</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div class="card t">
+      <h3 class="t">📚 Librería · funciones puras</h3>
+      <p style="font-size:27px">Reciben datos y <b>regresan</b> un resultado. No piden, no imprimen, no modifican nada de afuera.</p>
+      <div class="trow" style="justify-content:flex-start">
+        <div class="tnode t">co2</div><div class="tnode t">nivel</div><div class="tnode t">mayor_fuente</div>
+        <div class="tnode t">consejo</div><div class="tnode t">porcentaje</div><div class="tnode t">promedio</div>
+      </div>
+    </div>
+    <div class="card i step">
+      <h3 class="i">🖥 Programa · pide e imprime</h3>
+      <p style="font-size:27px">Aquí, y solo aquí, hay <span class="mono">input</span> y <span class="mono">print</span>. Usa las funciones de la librería.</p>
+      <div class="trow" style="justify-content:flex-start">
+        <div class="tnode i">pedir_consumo</div><div class="tnode i">menú</div><div class="tnode i">registrar</div>
+        <div class="tnode i">consultar</div><div class="tnode i">reporte</div>
+      </div>
+    </div>
+  </div>
+  <p class="q step">La librería es el <b>Nivel 1</b>. Se puede probar completa sin haber escrito el menú.</p>
+  <aside class="notes">
+    <p>🎙 «Esta separación es la idea de una <b>librería propia</b>: un bloque de funciones que se pueden usar desde cualquier programa. Python mismo está hecho así: round, len y print son funciones de su librería». <button class="term" data-term="libreria">Ver término</button></p>
+  </aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-title="Los contratos">
+  <div class="head"><p class="eyebrow">Paso 2 · <button class="term" data-term="contrato">Contratos</button> · el «qué», no el «cómo»</p><h2>Las seis funciones de la librería</h2></div>
+  <table class="tight">
+    <tr><th>Función</th><th>Recibe</th><th>Regresa</th></tr>
+    <tr><td class="mono">co2(cantidad, factor)</td><td>un consumo y su factor</td><td>kg de CO₂, redondeado a 2 decimales</td></tr>
+    <tr><td class="mono">nivel(huella)</td><td>kg de CO₂ del mes</td><td><span class="mono">"Bajo"</span>, <span class="mono">"Medio"</span> o <span class="mono">"Alto"</span></td></tr>
+    <tr><td class="mono">mayor_fuente(luz, agua, gasolina, basura)</td><td>los cuatro, ya en kg de CO₂</td><td>el nombre de la mayor; si empatan, gana la primera</td></tr>
+    <tr><td class="mono">consejo(fuente)</td><td><span class="mono">"Luz"</span>, <span class="mono">"Agua"</span>, <span class="mono">"Gasolina"</span> o <span class="mono">"Basura"</span></td><td>un texto con el consejo</td></tr>
+    <tr><td class="mono">porcentaje(parte, total)</td><td>dos números</td><td>% con 1 decimal; <span class="mono">0.0</span> si total es 0</td></tr>
+    <tr><td class="mono">promedio(valores)</td><td>una lista de números</td><td>el promedio con 2 decimales; <span class="mono">0.0</span> si está vacía</td></tr>
+  </table>
+  <p class="pausa">✍ En tu hoja: escribe un caso de prueba para cada una — llamada y resultado esperado</p>
+  <aside class="notes">
+    <p>🎙 «El contrato se los doy yo, para que todos los programas hablen el mismo idioma. Lo que ustedes escriben son los casos de prueba: una llamada con números concretos y lo que debe regresar».</p>
+    <p>Ejemplo en el pizarrón: <span class="mono">co2(250, 0.5) → 125.0</span>. Que hagan los otros cinco. 8 minutos.</p>
+  </aside>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-title="Los bordes">
+  <div class="head"><p class="eyebrow">Paso 2 · Donde se rompen los programas</p><h2>Los casos borde</h2></div>
+  <div class="grid3" style="gap:20px">
+    <div class="card"><p class="mono" style="font-size:30px">nivel(150)</p><p class="step si" style="font-size:30px">→ "Bajo"</p><p class="soft step" style="font-size:24px">«hasta 150» incluye el 150.</p></div>
+    <div class="card"><p class="mono" style="font-size:30px">nivel(300)</p><p class="step" style="font-size:30px;color:var(--ambar-d);font-weight:600">→ "Medio"</p><p class="soft step" style="font-size:24px">Mismo caso: el borde es del escalón de abajo.</p></div>
+    <div class="card"><p class="mono" style="font-size:30px">nivel(300.5)</p><p class="step no" style="font-size:30px">→ "Alto"</p><p class="soft step" style="font-size:24px">Ya pasó el borde.</p></div>
+    <div class="card"><p class="mono" style="font-size:30px">mayor_fuente(50, 50, 10, 5)</p><p class="step si" style="font-size:30px">→ "Luz"</p><p class="soft step" style="font-size:24px">Empate: gana la primera. Compara con <b>&gt;</b>, no con <b>&gt;=</b>.</p></div>
+    <div class="card"><p class="mono" style="font-size:30px">porcentaje(0, 0)</p><p class="step si" style="font-size:30px">→ 0.0</p><p class="soft step" style="font-size:24px">Sin la protección: ZeroDivisionError.</p></div>
+    <div class="card"><p class="mono" style="font-size:30px">promedio([])</p><p class="step si" style="font-size:30px">→ 0.0</p><p class="soft step" style="font-size:24px">Lista vacía: también dividiría entre cero.</p></div>
+  </div>
+  <aside class="notes">
+    <p>🎙 Pregunta cada uno antes de revelar. «¿Qué regresa nivel(150)?». Si alguien dice «Medio», pregunta: «¿qué dice la tabla: hasta 150 o menos de 150?».</p>
+    <p>🎙 «Estos casos borde van en sus pruebas. Son los que más se equivocan, y son los que más me gusta poner en el examen».</p>
+  </aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-title="A mano: Rivera">
+  <div class="head"><p class="eyebrow">Paso 3 · <button class="term" data-term="escritorio">Cálculo a mano</button> · familia de ejemplo</p><h2>Familia Rivera: 250 kWh · 15 m³ · 60 L · 30 kg</h2></div>
+  <p class="pausa">✍ Primero en tu hoja; luego revisamos</p>
+  <table class="tight">
+    <tr><th>Fuente</th><th>Consumo × factor</th><th>kg de CO₂</th><th>Porcentaje del total</th></tr>
+    <tr class="step"><td>Luz</td><td class="mono">250 × 0.5</td><td class="mono">125.0</td><td class="mono">125 ÷ 282.5 × 100 = 44.2 %</td></tr>
+    <tr class="step"><td>Agua</td><td class="mono">15 × 0.3</td><td class="mono">4.5</td><td class="mono">1.6 %</td></tr>
+    <tr class="step"><td>Gasolina</td><td class="mono">60 × 2.3</td><td class="mono">138.0</td><td class="mono">48.8 %</td></tr>
+    <tr class="step"><td>Basura</td><td class="mono">30 × 0.5</td><td class="mono">15.0</td><td class="mono">5.3 %</td></tr>
+    <tr class="step"><td>Huella total</td><td class="mono">125 + 4.5 + 138 + 15</td><td class="mono"><b>282.5</b></td><td>Nivel <b>Medio</b> (más de 150, hasta 300)</td></tr>
+    <tr class="step"><td>Mayor fuente</td><td colspan="3"><b>Gasolina</b> → «Comparte el auto, camina o usa el transporte público.»</td></tr>
+  </table>
+  <aside class="notes">
+    <p>🎙 «Estos números son sus casos de prueba. Cuando su código diga 282.5 y Medio, saben que está bien, porque ustedes ya lo calcularon».</p>
+    <p>Fíjate que el total se calcula primero; los porcentajes van al final porque necesitan el total. Es un orden que su código también debe respetar.</p>
+  </aside>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-title="Mi familia">
+  <div class="head"><p class="eyebrow">Paso 3 · Tu caso de prueba personal</p><h2>La familia que va en tu reto es la tuya</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card i"><h3 class="i">⚡ Luz</h3><p style="font-size:27px">Del recibo: kWh consumidos. Si es bimestral, <b>divide entre 2</b>.</p></div>
+      <div class="card i"><h3 class="i">💧 Agua</h3><p style="font-size:27px">Del recibo: m³ del mes.</p></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card a"><h3 class="a">⛽ Gasolina</h3><p style="font-size:27px">Litros por semana × 4. Si no hay auto en casa: 0.</p></div>
+      <div class="card a"><h3 class="a">🗑 Basura</h3><p style="font-size:27px">Estímalo y <b>escribe cómo lo estimaste</b>.</p></div>
+    </div>
+  </div>
+  <p class="q">Si hoy no tienes los datos, estima y corrígelos en casa. Lo importante: <b>tu cálculo a mano y tu programa deben dar lo mismo</b>.</p>
+  <aside class="notes">
+    <p>🎙 «Pregúntenle hoy a su familia y busquen los recibos. Cada uno va a tener números distintos; por eso este caso es suyo».</p>
+    <p>No pidas recibos ni datos personales en la entrega: solo los cuatro números. Si alguien prefiere no usar los de su casa, que use una familia inventada y lo diga.</p>
+  </aside>
+</section>
+
+<!-- 16 -->
+<section class="slide accent" data-title="Nivel 1" style="justify-content:center">
+  <p class="eyebrow">Momento 3 · 50 minutos</p>
+  <h1 style="font-size:96px">Ahora sí: abre la computadora.<br>Nivel 1, la librería.</h1>
+  <p style="font-size:40px" class="soft">Abre el artefacto del reto en Classroom y copia el esqueleto.</p>
+  <aside class="notes"><p><b>[1:00]</b> El artefacto pide primero el análisis, los contratos y el cálculo a mano (lo que ya tienen en la hoja: lo pasan). Al cuadrar la familia Rivera se abre la etapa del código y aparece el botón para copiar el esqueleto.</p></aside>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-title="El esqueleto">
+  <div class="head"><p class="eyebrow">Momento 3 · Cómo se ve tu archivo</p><h2>Un archivo, dos secciones, y las pruebas</h2></div>
+  <div class="grid2" style="grid-template-columns:.62fr 1.38fr;align-items:start">
+    <div class="filemap">
+      <div class="fm" style="border-color:var(--teal);background:var(--teal-t)"># ===== LIBRERÍA =====</div>
+      <div class="fm" style="border-color:var(--teal);background:#fff">def co2(...) ✓ ya viene resuelta</div>
+      <div class="fm" style="border-color:var(--teal);background:#fff">def nivel(...) · mayor_fuente · consejo · porcentaje · promedio</div>
+      <div class="fm" style="margin-top:14px"># ===== PROGRAMA =====</div>
+      <div class="fm" style="background:#fff">def prueba(...) ✓ ya viene</div>
+      <div class="fm" style="background:#fff">10 casos del profesor ✓ ya vienen + tus 6 casos</div>
+      <div class="fm a step">Nivel 2 y 3: aquí abajo va el menú (en casa)</div>
+    </div>
+    <div class="codewrap"><button class="copy" data-copy="kprueba">Copiar</button><pre class="code" id="kprueba" style="font-size:21px">def prueba(nombre, obtenido, esperado):
+    if obtenido == esperado:
+        print("OK   ", nombre, "→", obtenido)
+    else:
+        print("FALLA", nombre, "→", obtenido, "· esperaba", esperado)
+
+
+print("=== Pruebas de la librería ===")
+prueba("co2(250, 0.5)", co2(250, 0.5), 125.0)
+prueba("nivel(150)", nivel(150), "Bajo")
+# ... un caso por función, más tus bordes</pre></div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «La función prueba la les doy hecha: compara lo que regresa su función con lo que ustedes calcularon a mano. Si coinciden, imprime OK; si no, FALLA y les dice qué esperaba».</p>
+    <p>En el esqueleto las funciones vacías tienen <span class="mono">pass</span>: significa «todavía no hago nada». Se borra cuando escriban la función.</p>
+  </aside>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-title="Del contrato al código">
+  <div class="head"><p class="eyebrow">Momento 3 · Ejemplo resuelto</p><h2>Del contrato al código: co2</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card i"><p class="mono" style="font-size:26px">co2(cantidad, factor)</p><p style="font-size:27px">Recibe un consumo y su factor. Regresa kg de CO₂ con 2 decimales.</p></div>
+      <div class="card a step"><p style="font-size:27px"><b>Pseudocódigo</b><br>regresar redondear(cantidad × factor, 2)</p></div>
+      <div class="card t step"><p style="font-size:27px"><b>Prueba</b>: <span class="mono">co2(60, 2.3)</span> → 138.0, igual que en la hoja.</p></div>
+    </div>
+    <div class="codewrap step"><pre class="code" id="kco2" style="font-size:30px">def co2(cantidad, factor):
+    return round(cantidad * factor, 2)</pre></div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Esta ya se las doy. Fíjense: no tiene input ni print; solo recibe y regresa. Esa es la regla para las seis».</p>
+    <p>Pregunta: «¿Por qué no pongo el 0.5 dentro de la función?» → porque así sirve para los cuatro consumos, y porque si el factor viviera afuera en una variable, la función ya no sería pura.</p>
+  </aside>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-title="Pistas">
+  <div class="head"><p class="eyebrow">Momento 3 · Si te atoras</p><h2>Pistas: ¿a qué se parece?</h2></div>
+  <div class="grid3" style="gap:20px">
+    <div class="card step"><p class="mono" style="font-size:28px;color:var(--teal-d)">nivel</p><p style="font-size:27px">Igual que <span class="mono">costo_agua</span>: if, elif, else con <b>&lt;=</b>.</p></div>
+    <div class="card step"><p class="mono" style="font-size:28px;color:var(--teal-d)">mayor_fuente</p><p style="font-size:27px">Supón que la mayor es la luz. Compara con agua, gasolina y basura; si alguna es mayor, cambia de campeona.</p></div>
+    <div class="card step"><p class="mono" style="font-size:28px;color:var(--teal-d)">consejo</p><p style="font-size:27px">Un if por fuente que regresa su texto. Y un else por si llega algo raro.</p></div>
+    <div class="card step"><p class="mono" style="font-size:28px;color:var(--teal-d)">porcentaje</p><p style="font-size:27px">Como <span class="mono">diferencia</span> del recibo de luz: primero revisa el cero.</p></div>
+    <div class="card step"><p class="mono" style="font-size:28px;color:var(--teal-d)">promedio</p><p style="font-size:27px">Un acumulador con for, como el total del acopio. Primero revisa si la lista está vacía.</p></div>
+    <div class="card r step"><p style="font-size:27px"><b>¿FALLA?</b> No cambies el esperado. Haz la <button class="term" data-term="escritorio">prueba de escritorio</button> de tu función con ese caso.</p></div>
+  </div>
+  <aside class="notes">
+    <p>Muestra las pistas una por una, solo cuando la mayoría se atore en esa función. Recorre el salón: a quien tenga FALLA, pídele que te explique su función con el caso a mano antes de decirle dónde está el error.</p>
+  </aside>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-title="Nivel 1 listo">
+  <div class="head"><p class="eyebrow">Momento 3 · Así se ve el Nivel 1 terminado</p><h2>Todo en OK: tienes tu 70 asegurado</h2></div>
+  <div class="consola" style="font-size:25px">=== Pruebas de la librería ===
+OK    co2(250, 0.5) → 125.0
+OK    nivel(150) → Bajo
+OK    nivel(300) → Medio
+OK    nivel(300.5) → Alto
+OK    mayor_fuente(125, 4.5, 138, 15) → Gasolina
+OK    mayor_fuente(50, 50, 10, 5) → Luz
+OK    porcentaje(138, 282.5) → 48.8
+OK    porcentaje(0, 0) → 0.0
+OK    promedio([282.5, 103.6, 506]) → 297.37
+OK    promedio([]) → 0.0
+OK    co2(60, 2.3) → 138.0
+OK    nivel(506) → Alto
+OK    mayor_fuente(0, 3.6, 0, 10) → Basura
+OK    consejo('Agua') → Repara fugas y acorta el tiempo en la regadera.
+OK    porcentaje(90, 103.6) → 86.9
+OK    promedio([100, 200]) → 150.0</div>
+  <aside class="notes">
+    <p>🎙 «Cuando vean todos sus casos en OK, incluidos los que ustedes escribieron, levanten la mano y paso a verlo». Si da tiempo, que registren su avance en el artefacto antes de irse.</p>
+  </aside>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-title="Niveles 2 y 3">
+  <div class="head"><p class="eyebrow">En casa · el patrón del acopio</p><h2>Niveles 2 y 3: el menú y el reporte</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div class="menubox">
+      <p class="lbl">=== Huella de Carbono de mi Comunidad ===</p>
+      <div class="card i"><p style="font-size:26px"><b>1. Registrar</b> · pide con <span class="mono">pedir_consumo</span>, convierte, muestra el desglose y guarda nombre y huella en dos listas.</p></div>
+      <div class="card i"><p style="font-size:26px"><b>2. Consultar</b> · busca el nombre; si no está, avisa.</p></div>
+      <div class="card a"><p style="font-size:26px"><b>3. Reporte</b> · <button class="term" data-term="seleccion">ordena</button> de mayor a menor, promedio y familias por nivel.</p></div>
+      <div class="card"><p style="font-size:26px"><b>4. Salir</b></p></div>
+    </div>
+    <div class="consola step" style="font-size:23px"><span class="pr">Opción: 3</span>--- RANKING DE LA COMUNIDAD ---
+1. Mendoza: 506.0 kg · Alto
+2. Rivera: 282.5 kg · Medio
+3. Torres: 103.6 kg · Bajo
+Promedio de la comunidad: 297.37 kg de CO2 al mes
+Familias por nivel → Bajo: 1 · Medio: 1 · Alto: 1</div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Abran su acopio: el menú, buscar y el reporte son los mismos. Cambia el tema, no la lógica».</p>
+    <p>Las tres familias de prueba (Rivera, Torres, Mendoza) vienen en el artefacto con sus valores; ahí también registran la suya. Si no hay familias, la opción 3 debe decir «Aún no hay familias registradas».</p>
+  </aside>
+</section>
+
+<!-- 22 -->
+<section class="slide" data-title="Entrega y reglas">
+  <div class="head"><p class="eyebrow">Entrega · individual</p><h2>Lunes 23 de noviembre, antes de la clase</h2></div>
+  <div class="grid2" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card t"><h3 class="t">Qué subes a Classroom</h3><p style="font-size:27px">1. El PDF que genera el artefacto.<br>2. Tu archivo <span class="mono">huella.py</span>.<br>3. ⭐ Opcional: <span class="mono">huella.js</span>.</p></div>
+      <div class="card i"><h3 class="i">El lunes, en clase</h3><p style="font-size:27px">Una o dos preguntas sobre tu código: «¿qué hace esta línea?», «¿qué pasa si…?».</p></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card a"><h3 class="a">Sobre la IA</h3><p style="font-size:27px">Puedes usarla para entender un error, no para que escriba tu programa. Si la usas, lo declaras en el artefacto y dices para qué.</p></div>
+      <div class="card r"><h3 class="r">Sobre copiar</h3><p style="font-size:27px">Tu familia hace que tu caso sea único. Si no puedes explicar una parte de tu código, esa parte no cuenta.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>🎙 «Lo que más les va a servir para el examen del miércoles 25 es haber hecho esto ustedes. El lunes repasamos con sus propios programas».</p>
+  </aside>
+</section>
+
+<!-- 23 -->
+<section class="slide" data-title="Rúbrica">
+  <div class="head"><p class="eyebrow">Cómo se califica · 100 puntos</p><h2>Rúbrica del reto</h2></div>
+  <table class="tight">
+    <tr><th>Nivel</th><th>Criterio</th><th>Puntos</th></tr>
+    <tr><td rowspan="4" style="vertical-align:top">1 · Librería<br><span class="soft" style="font-weight:400">hasta 70</span></td><td style="font-weight:400">Análisis: entradas, proceso, salidas y dos decisiones de diseño explicadas</td><td class="mono">10</td></tr>
+    <tr><td style="font-weight:400">Contratos con un caso de prueba propio por función, incluidos casos borde</td><td class="mono">10</td></tr>
+    <tr><td style="font-weight:400">Cálculo a mano de Rivera y de tu familia, que coincide con tu programa</td><td class="mono">10</td></tr>
+    <tr><td style="font-weight:400">Las 6 funciones puras correctas, sin input ni print, con sus pruebas en OK</td><td class="mono">40</td></tr>
+    <tr><td rowspan="2" style="vertical-align:top">2 · Sistema<br><span class="soft" style="font-weight:400">hasta 85</span></td><td style="font-weight:400">Menú que se repite; <span class="mono">pedir_consumo</span> rechaza negativos</td><td class="mono">8</td></tr>
+    <tr><td style="font-weight:400">Registro en listas paralelas con desglose; consulta con búsqueda</td><td class="mono">7</td></tr>
+    <tr><td rowspan="2" style="vertical-align:top">3 · Comunidad<br><span class="soft" style="font-weight:400">hasta 100</span></td><td style="font-weight:400">Ranking de mayor a menor con ordenamiento por selección</td><td class="mono">8</td></tr>
+    <tr><td style="font-weight:400">Promedio, familias por nivel y aviso cuando no hay familias</td><td class="mono">7</td></tr>
+    <tr><td>⭐ Extra</td><td style="font-weight:400">La librería en JavaScript con sus pruebas (tope 100)</td><td class="mono">+5</td></tr>
+  </table>
+  <aside class="notes"><p>La rúbrica completa, con lo que se revisa en cada criterio, va en el artefacto y en la hoja impresa.</p></aside>
+</section>
+
+<!-- 24 -->
+<section class="slide" data-title="Calendario">
+  <div class="head"><p class="eyebrow">Lo que queda del parcial</p><h2>Tres fechas</h2></div>
+  <div class="grid3">
+    <div class="card t"><p class="mono" style="font-size:26px;color:var(--teal-d)">HOY · MIÉ 18</p><h3>Reto y Nivel 1</h3><p class="soft">Sales con la librería probada.</p></div>
+    <div class="card i"><p class="mono" style="font-size:26px;color:var(--indigo-d)">LUN 23</p><h3>Entrega y repaso</h3><p class="soft">Antes de clase: PDF y archivo. En clase: defensas cortas y repaso con tus programas.</p></div>
+    <div class="card a"><p class="mono" style="font-size:26px;color:var(--ambar-d)">MIÉ 25</p><h3>Examen parcial</h3><p class="soft">Trazas, predecir salidas y completar funciones: lo que hiciste en el reto.</p></div>
+  </div>
+  <aside class="notes"><p>🎙 «El examen se parece al reto: leer código, seguirlo a mano y completar funciones con contrato. Si hicieron el reto ustedes, ya practicaron el examen».</p></aside>
+</section>
+
+<!-- 25 -->
+<section class="slide dark" data-title="Cierre">
+  <p class="eyebrow">Cierre</p>
+  <div class="spacer"></div>
+  <h1 style="font-size:92px;max-width:1600px">Empezaste el semestre con una variable. Hoy armas un sistema completo.</h1>
+  <p style="font-size:40px" class="soft">Entender, dividir, probar a mano, programar. Eso es lo que te llevas de esta materia.</p>
+  <div class="spacer"></div>
+  <aside class="notes"><p>🎙 «Lo que quiero que se lleven no es Python: es el método. Funciona en cualquier lenguaje y con cualquier problema. Nos vemos el lunes con su reto».</p></aside>
+</section>
+
+<!-- 26 -->
+<section class="slide" data-title="Referencias">
+  <div class="head"><p class="eyebrow">Referencias · APA 7</p><h2>Fuentes de los conceptos</h2></div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <p style="font-size:25px">Downey, A. B. (2020). <i>Think Python: How to think like a computer scientist</i> (2.ª ed.). O’Reilly Media.</p>
+    <p style="font-size:25px">Gaddis, T. (2021). <i>Starting out with programming logic and design</i> (6.ª ed.). Pearson.</p>
+    <p style="font-size:25px">Meyer, B. (1992). Applying “design by contract”. <i>Computer, 25</i>(10), 40–51.</p>
+    <p style="font-size:25px">Python Software Foundation. (2024). <i>The Python tutorial: Modules</i>. https://docs.python.org/3/tutorial/modules.html</p>
+    <p style="font-size:25px">Sedgewick, R., &amp; Wayne, K. (2011). <i>Algorithms</i> (4.ª ed.). Addison-Wesley.</p>
+    <p style="font-size:25px">Universidad de Colima. (2026). <i>Modelo Educativo de la Universidad de Colima</i>. Dirección General de Publicaciones.</p>
+    <p style="font-size:25px">Wiedmann, T., &amp; Minx, J. (2008). A definition of “carbon footprint”. En C. C. Pertsova (Ed.), <i>Ecological economics research trends</i> (pp. 1–11). Nova Science Publishers.</p>
+    <p style="font-size:25px">Wing, J. M. (2006). Computational thinking. <i>Communications of the ACM, 49</i>(3), 33–35.</p>
+  </div>
+  <div class="card" style="margin-top:auto"><h3 style="font-size:30px">Transparencia de uso de IA</h3><p style="font-size:24px" class="soft">Material elaborado por el Ing. Ricardo Jaramillo Velasco con apoyo de IA generativa (Claude, Anthropic) y revisado por el profesor, conforme al Acuerdo No. 23 de 2024 de la Universidad de Colima. Todas las salidas mostradas se verificaron ejecutando el código en Python y JavaScript.</p></div>
+  <aside class="notes"><p>Lámina de respaldo.</p></aside>
+</section>
+
+<div class="foot" id="foot"><img src="data:image/png;base64,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" alt="Universidad de Colima"><span>Fundamentos de Programación · Reto final · Huella de Carbono de mi Comunidad</span><span class="sp"></span><span id="pageno"></span></div>
+<div id="progress"></div>
+</div></div>
+
+<div id="notes" role="region" aria-label="Notas del profesor"><h5 id="notesTitle">Notas del profesor</h5><div id="notesBody"></div></div>
+<div id="ctrl" role="toolbar" aria-label="Controles">
+  <button id="bPrev" title="Anterior (←)">◀</button>
+  <button id="bNext" title="Siguiente (→)">▶</button>
+  <button id="bNotes" title="Notas del profesor (N)">Notas</button>
+  <button id="bFull" title="Pantalla completa (F)">Pantalla</button>
+</div>
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle"><div class="box"><div class="mh"><h4 id="mTitle"></h4><button id="mClose" aria-label="Cerrar">×</button></div><div class="mb" id="mBody"></div></div></div>
+
+<script id="fullcode" type="text/plain"></script>
+<script id="fullcode3" type="text/plain"></script>
+<script>
+(function(){
+  "use strict";
+  var deck = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var cur = 0;
+
+  /* escala 1920x1080 */
+  function fit(){ var vw = window.innerWidth, vh = window.innerHeight; var W = Math.round(Math.min(2560, Math.max(1920, 1080 * vw / vh))); var H = Math.round(Math.min(1350, Math.max(1080, 1920 * vh / vw))); deck.style.width = W + "px"; deck.style.height = H + "px"; var s = Math.min(vw / W, vh / H); deck.style.transform = "scale(" + s + ")"; }
+  window.addEventListener("resize", fit); fit();
+
+  /* resaltado de Python */
+  function esc(t){ return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var RX = /((?:#|\/\/).*$)|(f?"(?:[^"\\]|\\.)*")|\b(while|if|elif|else|for|in|break|and|or|not|def|return|function|let|const|None)\b|\b(print|input|float|int|round|len|range|type|Math|prompt|parseFloat|console)\b|\b(\d+(?:\.\d+)?)\b/g;
+  function hl(src){
+    return src.split("\n").map(function(line){
+      var out = "", last = 0, m; RX.lastIndex = 0;
+      while((m = RX.exec(line))){
+        out += esc(line.slice(last, m.index));
+        var cls = m[1] ? "cm" : m[2] ? "st" : m[3] ? "kw" : m[4] ? "bi" : "nu";
+        out += '<span class="' + cls + '">' + esc(m[0]) + "</span>";
+        last = RX.lastIndex;
+      }
+      return out + esc(line.slice(last));
+    }).join("\n");
+  }
+  var RAW = {};
+  Array.prototype.forEach.call(document.querySelectorAll("pre.code[id]"), function(p){
+    RAW[p.id] = p.textContent;
+    var lines = hl(p.textContent).split("\n").map(function(l){ return '<span class="cl">' + (l || " ") + "</span>"; });
+    var g = p.getAttribute("data-groups");
+    if(g){
+      var sizes = g.split(",").map(Number), out = "", k = 0, o0 = Number(p.getAttribute("data-ostart") || 0), os = Number(p.getAttribute("data-ostep") || 1);
+      sizes.forEach(function(n, gi){ out += '<span class="cg step"' + (o0 ? ' data-o="' + (o0 + gi * os) + '"' : "") + ">" + lines.slice(k, k + n).join("") + "</span>"; k += n; });
+      p.innerHTML = out + lines.slice(k).join("");
+    } else p.innerHTML = lines.join("");
+  });
+  var FULL = document.getElementById("fullcode").textContent.replace(/^\n/, "");
+  var FULL3 = document.getElementById("fullcode3").textContent.replace(/^\n/, "");
+
+  /* pasos */
+  function stepsOf(s){
+    var a = Array.prototype.slice.call(s.querySelectorAll(".step, .step-blur, .step-hl"));
+    if(!a.some(function(e){ return e.hasAttribute("data-o"); })) return a;
+    return a.map(function(e, i){ return [e, e.hasAttribute("data-o") ? Number(e.getAttribute("data-o")) : 1000 + i, i]; })
+      .sort(function(x, y){ return x[1] - y[1] || x[2] - y[2]; }).map(function(x){ return x[0]; });
+  }
+  function paintPtr(s){
+    Array.prototype.forEach.call(s.querySelectorAll("pre.code .cl.now"), function(l){ l.classList.remove("now"); });
+    var on = stepsOf(s).filter(function(e){ return e.classList.contains("on"); });
+    var last = null;
+    for(var i = on.length - 1; i >= 0; i--){ if(on[i].classList.contains("ptr")){ last = on[i]; break; } if(!on[i].classList.contains("ptr") && on[i].closest("tr")) continue; }
+    var lastAny = on[on.length - 1];
+    if(last){
+      last.getAttribute("data-pre").split(",").forEach(function(id){ var pre = document.getElementById(id.trim()); var ls = pre ? pre.querySelectorAll(".cl") : []; var ln = ls[Number(last.getAttribute("data-line")) - 1]; if(ln) ln.classList.add("now"); });
+    }
+  }
+  function shown(s){ return stepsOf(s).filter(function(e){ return e.classList.contains("on"); }).length; }
+
+  /* minimapa */
+  var BLOCKS = ["0","A1","A2","B","C1","C2","C3","f"];
+  var BLABEL = {"0":"Menú","A2":"A2·A3","f":"f()"};
+  var mm = document.getElementById("minimap");
+  mm.innerHTML = BLOCKS.map(function(b){ return "<span>" + (BLABEL[b] || b) + "</span>"; }).join("");
+  function paintMini(s){
+    var b = s.getAttribute("data-block");
+    if(b === null){ mm.style.display = "none"; return; }
+    mm.style.display = "flex";
+    var idx = BLOCKS.indexOf(b);
+    Array.prototype.forEach.call(mm.children, function(c, i){ c.className = i < idx ? "done" : i === idx ? "cur" : ""; });
+  }
+
+  var notesEl = document.getElementById("notes"), notesBody = document.getElementById("notesBody");
+  function show(i, fromBack){
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    slides[cur].classList.remove("active");
+    cur = i; var s = slides[cur];
+    s.classList.add("active");
+    stepsOf(s).forEach(function(e){ e.classList.toggle("on", !!fromBack); });
+    var dark = s.classList.contains("dark") || s.classList.contains("accent");
+    document.getElementById("foot").style.display = (cur === 0 || dark) ? "none" : "flex";
+    document.getElementById("pageno").textContent = (cur + 1) + " / " + slides.length;
+    document.getElementById("progress").style.width = ((cur + 1) / slides.length * 100) + "%";
+    var n = s.querySelector("aside.notes");
+    document.getElementById("notesTitle").textContent = "Notas del profesor · lámina " + (cur + 1) + ". " + (s.getAttribute("data-title") || "");
+    notesBody.innerHTML = n ? n.innerHTML : "<p>Sin notas.</p>";
+    paintMini(s); paintPtr(s);
+    try{ history.replaceState(null, "", "#" + (cur + 1)); }catch(e){}
+  }
+  function next(){
+    var st = stepsOf(slides[cur]), k = shown(slides[cur]);
+    if(k < st.length){ st[k].classList.add("on"); paintPtr(slides[cur]); return; }
+    if(cur < slides.length - 1) show(cur + 1, false);
+  }
+  function prev(){
+    var st = stepsOf(slides[cur]), k = shown(slides[cur]);
+    if(k > 0){ st[k - 1].classList.remove("on"); paintPtr(slides[cur]); return; }
+    if(cur > 0) show(cur - 1, true);
+  }
+
+  /* modal */
+  var TERMS = {
+    huella: { t:"Huella de carbono", d:"Cantidad total de dióxido de carbono (CO₂) que se emite, directa o indirectamente, por una actividad o por lo que consume una persona, una familia o una organización. Se mide en kilogramos o toneladas de CO₂. En este reto se estima con factores simplificados: cada kWh, m³, litro o kilo se multiplica por los kg de CO₂ que le corresponden.", c:"huella = luz + agua + gasolina + basura   # ya en kg de CO2", r:"Wiedmann, T., &amp; Minx, J. (2008). A definition of “carbon footprint”. En C. C. Pertsova (Ed.), <i>Ecological economics research trends</i> (pp. 1–11). Nova Science Publishers." },
+    pura: { t:"Función pura", d:"Una función que, con los mismos argumentos, siempre regresa el mismo resultado y no produce efectos secundarios: no imprime, no pide datos y no modifica variables ni listas que existan fuera de ella.", c:"def doble(n):\n    return n * 2      # pura", r:"Downey, A. B. (2020). <i>Think Python: How to think like a computer scientist</i> (2.ª ed.). O’Reilly Media." },
+    contrato: { t:"Diseño por contrato", d:"Cada función se define por lo que promete: cómo se llama, qué recibe, qué regresa y con qué casos se comprueba. Si el contrato está claro, la función se puede escribir y probar en cualquier lenguaje sin conocer el resto del programa.", c:"", r:"Meyer, B. (1992). Applying “design by contract”. <i>Computer, 25</i>(10), 40–51." },
+    escritorio: { t:"Prueba de escritorio (cálculo a mano)", d:"Seguir un algoritmo a mano, paso por paso, anotando el valor de cada variable sin ejecutarlo. Sirve para saber de antemano qué debe dar el programa y para encontrar errores de lógica cuando el resultado no coincide.", c:"", r:"Gaddis, T. (2021). <i>Starting out with programming logic and design</i> (6.ª ed.). Pearson." },
+    descomposicion: { t:"Descomposición (divide y vencerás)", d:"Partir un problema grande en partes más pequeñas que se pueden entender, resolver y probar por separado, para después integrarlas. Es uno de los pilares del pensamiento computacional.", c:"", r:"Wing, J. M. (2006). Computational thinking. <i>Communications of the ACM, 49</i>(3), 33–35." },
+    libreria: { t:"Librería propia (módulo)", d:"Un conjunto de funciones agrupadas para usarse desde otros programas. En Python, un archivo con funciones es un módulo y se puede importar con import. En este reto la librería es la sección de funciones puras al inicio del archivo, separada del programa que pide e imprime.", c:"# huella_lib.py contiene las funciones\nfrom huella_lib import nivel\nprint(nivel(282.5))   # Medio", r:"Python Software Foundation. (2024). <i>The Python tutorial: Modules</i>. https://docs.python.org/3/tutorial/modules.html" },
+    seleccion: { t:"Ordenamiento por selección", d:"Para cada posición i, se busca el mayor (o el menor) de los elementos que faltan y se intercambia con el de la posición i. En listas paralelas, cada intercambio se hace en todas las listas para que los datos de una misma familia sigan juntos.", c:"for i in range(len(h) - 1):\n    mayor = i\n    for j in range(i + 1, len(h)):\n        if h[j] > h[mayor]:\n            mayor = j\n    intercambiar(h, i, mayor)\n    intercambiar(nombres, i, mayor)", r:"Sedgewick, R., &amp; Wayne, K. (2011). <i>Algorithms</i> (4.ª ed.). Addison-Wesley." },
+    modelo: { t:"Los cinco saberes", d:"El Modelo Educativo 2026 de la Universidad de Colima organiza la formación en cinco saberes interrelacionados: Conocer, Hacer, Ser, Convivir y Transformar.", c:"", r:"Universidad de Colima. (2026). <i>Modelo Educativo de la Universidad de Colima</i>. Dirección General de Publicaciones." }
+  };
+  var modal = document.getElementById("modal"), mBody = document.getElementById("mBody"), mTitle = document.getElementById("mTitle"), lastFocus = null;
+  function openModal(title, html){ lastFocus = document.activeElement; mTitle.textContent = title; mBody.innerHTML = html; modal.classList.add("show"); document.getElementById("mClose").focus(); }
+  function closeModal(){ modal.classList.remove("show"); if(lastFocus) lastFocus.focus(); }
+  document.getElementById("mClose").addEventListener("click", closeModal);
+  modal.addEventListener("click", function(e){ if(e.target === modal) closeModal(); });
+
+  function copyText(t, btn){
+    var done = function(){ var o = btn.textContent; btn.textContent = "¡Copiado!"; setTimeout(function(){ btn.textContent = o; }, 1400); };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){ fallback(t); done(); }); } else { fallback(t); done(); }
+  }
+  function fallback(t){ var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(e){} document.body.removeChild(ta); }
+
+  document.addEventListener("click", function(e){
+    var t = e.target.closest(".term, .ref");
+    if(t){ e.stopPropagation(); var d = TERMS[t.getAttribute("data-term")]; if(!d) return;
+      openModal(d.t, "<p>" + d.d + "</p>" + (d.c ? "<pre>" + esc(d.c) + "</pre>" : "") + "<div class='apa'><b>Referencia (APA 7):</b> " + d.r + "</div>"); return; }
+    var c = e.target.closest(".copy");
+    if(c){ e.stopPropagation();
+      if(c.getAttribute("data-full")){ var u3 = c.getAttribute("data-full") === "u3", TXT = u3 ? FULL3 : FULL;
+        openModal(u3 ? "Solución completa · JavaScript" : "Solución completa · Python", "<p>Probada con las seis contraseñas de la hoja" + (u3 ? " en JavaScript; da la misma salida que la de Python." : ".") + "</p><button class='copy' id='copyFull' style='position:static;margin-bottom:10px'>Copiar todo</button><div class='full'>" + esc(TXT) + "</div>");
+        document.getElementById("copyFull").addEventListener("click", function(ev){ ev.stopPropagation(); copyText(TXT, ev.target); }); return; }
+      copyText(RAW[c.getAttribute("data-copy")], c); return; }
+    if(modal.classList.contains("show")) return;
+    if(e.target.closest("#ctrl, #notes")) return;
+    if(e.target.closest("#deck")) next();
+  });
+
+  document.getElementById("bPrev").addEventListener("click", function(e){ e.stopPropagation(); prev(); });
+  document.getElementById("bNext").addEventListener("click", function(e){ e.stopPropagation(); next(); });
+  document.getElementById("bNotes").addEventListener("click", function(e){ e.stopPropagation(); notesEl.classList.toggle("show"); });
+  function full(){ try{ if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }catch(e){} }
+  document.getElementById("bFull").addEventListener("click", function(e){ e.stopPropagation(); full(); });
+
+  document.addEventListener("keydown", function(e){
+    if(modal.classList.contains("show")){ if(e.key === "Escape") closeModal(); return; }
+    var tag = (e.target.tagName || "").toLowerCase();
+    if(tag === "button" && (e.key === "Enter" || e.key === " ")) return;
+    if(["ArrowRight","PageDown"," ","Enter"].indexOf(e.key) >= 0){ e.preventDefault(); next(); }
+    else if(["ArrowLeft","PageUp","Backspace"].indexOf(e.key) >= 0){ e.preventDefault(); prev(); }
+    else if(e.key === "Home"){ show(0); } else if(e.key === "End"){ show(slides.length - 1); }
+    else if(e.key === "n" || e.key === "N"){ notesEl.classList.toggle("show"); }
+    else if(e.key === "f" || e.key === "F"){ full(); }
+  });
+
+  window.addEventListener("hashchange", function(){ var k = parseInt((location.hash || "").slice(1), 10); if(!isNaN(k) && k - 1 !== cur) show(k - 1, false); });
+  var h = parseInt((location.hash || "").slice(1), 10);
+  slides.forEach(function(s){ s.classList.remove("active"); });
+  slides[0].classList.add("active");
+  show(isNaN(h) ? 0 : h - 1, false);
+})();
+</script>
+</body>
+</html>
